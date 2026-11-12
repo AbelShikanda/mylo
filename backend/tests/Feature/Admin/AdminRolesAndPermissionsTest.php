@@ -13,7 +13,7 @@ class AdminRolesAndPermissionsTest extends AdminTestCase
         $token = $admin->createToken('admin-api')->plainTextToken;
 
         $response = $this->withHeader('Authorization', 'Bearer '.$token)
-            ->getJson('/api/v1/roles');
+            ->getJson('/api/v1/admin/roles');
 
         $response->assertStatus(200);
     }
@@ -25,7 +25,7 @@ class AdminRolesAndPermissionsTest extends AdminTestCase
         $token = $admin->createToken('admin-api')->plainTextToken;
 
         $response = $this->withHeader('Authorization', 'Bearer '.$token)
-            ->getJson('/api/v1/permissions');
+            ->getJson('/api/v1/admin/permissions');
 
         $response->assertStatus(200);
     }
@@ -37,7 +37,7 @@ class AdminRolesAndPermissionsTest extends AdminTestCase
         $token = $admin->createToken('admin-api')->plainTextToken;
 
         $response = $this->withHeader('Authorization', 'Bearer '.$token)
-            ->getJson('/api/v1/audit-logs');
+            ->getJson('/api/v1/admin/audit-logs');
 
         $response->assertStatus(200);
     }
@@ -49,7 +49,7 @@ class AdminRolesAndPermissionsTest extends AdminTestCase
         $token = $admin->createToken('admin-api')->plainTextToken;
 
         $response = $this->withHeader('Authorization', 'Bearer '.$token)
-            ->getJson('/api/v1/config');
+            ->getJson('/api/v1/admin/config');
 
         $response->assertStatus(200);
     }

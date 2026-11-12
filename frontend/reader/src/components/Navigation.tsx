@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { authStorage } from '@/lib/auth';
@@ -16,7 +17,12 @@ const readerNav = [
 ];
 
 export function ReaderNavigation() {
-  const pathname = usePathname();
+  const [pathname, setPathname] = useState<string>('/');
+
+  useEffect(() => {
+    setPathname(usePathname());
+  }, []);
+
   const token = authStorage.getToken();
 
   return (

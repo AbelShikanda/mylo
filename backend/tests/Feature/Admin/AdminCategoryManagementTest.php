@@ -15,7 +15,7 @@ class AdminCategoryManagementTest extends AdminTestCase
         $token = $admin->createToken('admin-api')->plainTextToken;
 
         $response = $this->withHeader('Authorization', 'Bearer '.$token)
-            ->getJson('/api/v1/categories');
+            ->getJson('/api/v1/admin/categories');
 
         $response->assertStatus(200);
         $response->assertJsonCount(3, 'data');
@@ -28,7 +28,7 @@ class AdminCategoryManagementTest extends AdminTestCase
         $token = $admin->createToken('admin-api')->plainTextToken;
 
         $response = $this->withHeader('Authorization', 'Bearer '.$token)
-            ->postJson('/api/v1/categories', [
+            ->postJson('/api/v1/admin/categories', [
                 'name' => 'Food and Culinary',
                 'slug' => 'food-culinary',
                 'description' => 'Food and cooking articles',
@@ -49,7 +49,7 @@ class AdminCategoryManagementTest extends AdminTestCase
         $token = $admin->createToken('admin-api')->plainTextToken;
 
         $response = $this->withHeader('Authorization', 'Bearer '.$token)
-            ->deleteJson('/api/v1/categories/'.$category->id);
+            ->deleteJson('/api/v1/admin/categories/'.$category->id);
 
         $response->assertStatus(200);
         $this->assertSoftDeleted($category);

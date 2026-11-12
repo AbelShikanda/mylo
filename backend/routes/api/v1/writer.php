@@ -19,7 +19,7 @@ use App\Http\Controllers\Api\V1\Writer\AnalyticsController;
 | Guard: auth:sanctum,writer
 */
 
-Route::middleware('auth:sanctum,writer')->group(function () {
+Route::prefix('writer')->middleware('auth:sanctum')->group(function () {
     // Profile
     Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');

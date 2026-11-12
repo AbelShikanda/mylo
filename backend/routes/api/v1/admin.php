@@ -31,7 +31,7 @@ use App\Http\Controllers\Api\V1\Admin\ConfigController;
 | Guard: auth:sanctum,admin
 */
 
-Route::middleware('auth:sanctum,admin')->group(function () {
+Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     // Dashboard
     Route::get('dashboard/stats', [DashboardController::class, 'stats'])->name('dashboard.stats');
 

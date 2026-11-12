@@ -14,7 +14,7 @@ class AdminDashboardTest extends AdminTestCase
         $token = $admin->createToken('admin-api')->plainTextToken;
 
         $response = $this->withHeader('Authorization', 'Bearer '.$token)
-            ->getJson('/api/v1/dashboard/stats');
+            ->getJson('/api/v1/admin/dashboard/stats');
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -35,7 +35,7 @@ class AdminDashboardTest extends AdminTestCase
         $token = $reader->createToken('reader-api')->plainTextToken;
 
         $response = $this->withHeader('Authorization', 'Bearer '.$token)
-            ->getJson('/api/v1/dashboard/stats');
+            ->getJson('/api/v1/admin/dashboard/stats');
 
         $response->assertStatus(403);
     }

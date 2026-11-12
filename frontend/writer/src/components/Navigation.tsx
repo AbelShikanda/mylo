@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { authStorage } from '@/lib/auth';
@@ -20,7 +21,12 @@ const writerNav = [
 ];
 
 export function WriterNavigation() {
-  const pathname = usePathname();
+  const [pathname, setPathname] = useState<string>('/');
+
+  useEffect(() => {
+    setPathname(usePathname());
+  }, []);
+
   const token = authStorage.getToken();
 
   return (

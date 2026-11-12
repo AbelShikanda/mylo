@@ -17,7 +17,7 @@ use App\Http\Controllers\Api\V1\Reader\OrderController;
 | Guard: auth:sanctum,reader
 */
 
-Route::middleware('auth:sanctum,reader')->group(function () {
+Route::prefix('reader')->middleware('auth:sanctum')->group(function () {
     // Profile
     Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');

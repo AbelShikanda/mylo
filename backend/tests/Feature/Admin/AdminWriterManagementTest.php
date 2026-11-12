@@ -15,7 +15,7 @@ class AdminWriterManagementTest extends AdminTestCase
         $token = $admin->createToken('admin-api')->plainTextToken;
 
         $response = $this->withHeader('Authorization', 'Bearer '.$token)
-            ->getJson('/api/v1/writers');
+            ->getJson('/api/v1/admin/writers');
 
         $response->assertStatus(200);
         $response->assertJsonCount(3, 'data');
@@ -29,7 +29,7 @@ class AdminWriterManagementTest extends AdminTestCase
         $token = $admin->createToken('admin-api')->plainTextToken;
 
         $response = $this->withHeader('Authorization', 'Bearer '.$token)
-            ->putJson('/api/v1/writers/'.$writer->id.'/suspend');
+            ->putJson('/api/v1/admin/writers/'.$writer->id.'/suspend');
 
         $response->assertStatus(200);
         $this->assertSoftDeleted($writer);

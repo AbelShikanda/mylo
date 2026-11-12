@@ -5,11 +5,18 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Identity\Article;
 use App\Models\Identity\AuditLog;
+use App\Services\Publishing\ArticleService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 
 class ArticleController extends Controller
 {
+    protected ArticleService $articleService;
+
+    public function __construct(ArticleService $articleService)
+    {
+        $this->articleService = $articleService;
+    }
+
     public function index(Request $request)
     {
         abort_unless($request->user()->hasPermission('articles.view'), 403);
@@ -39,11 +46,11 @@ class ArticleController extends Controller
         ]);
     }
 
-    public function feature(Request $request, Article $article)
+    public function feature(Request $request, Article $article, ArticleService $articleService)
     {
         abort_unless($request->user()->hasPermission('articles.feature'), 403);
 
-        $article->update(['is_featured' => true]);
+        $articleService->featureArticle($article);
 
         AuditLog::create([
             'administrator_id' => $request->user()->id,
@@ -58,11 +65,11 @@ class ArticleController extends Controller
         return response()->json(['message' => 'Article featured']);
     }
 
-    public function unfeature(Request $request, Article $article)
+    public function unfeature(Request $request, Article $article, ArticleService $articleService)
     {
         abort_unless($request->user()->hasPermission('articles.unfeature'), 403);
 
-        $article->update(['is_featured' => false]);
+        $articleService->unfeatureArticle($article);
 
         AuditLog::create([
             'administrator_id' => $request->user()->id,
