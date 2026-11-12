@@ -38,8 +38,10 @@ Route::middleware('auth:sanctum,admin')->group(function () {
     // User management
     Route::get('readers', [ReaderController::class, 'index'])->name('readers.index');
     Route::get('writers', [WriterController::class, 'index'])->name('writers.index');
-    Route::put('users/{user}/suspend', [ReaderController::class, 'suspend'])->name('users.suspend');
-    Route::put('users/{user}/reinstate', [ReaderController::class, 'reinstate'])->name('users.reinstate');
+    Route::put('users/{reader}/suspend', [ReaderController::class, 'suspend'])->name('users.suspend');
+    Route::put('users/{reader}/reinstate', [ReaderController::class, 'reinstate'])->name('users.reinstate');
+    Route::put('writers/{writer}/suspend', [WriterController::class, 'suspend'])->name('writers.suspend');
+    Route::put('writers/{writer}/reinstate', [WriterController::class, 'reinstate'])->name('writers.reinstate');
 
     // Article management
     Route::get('articles', [ArticleController::class, 'index'])->name('articles.index');

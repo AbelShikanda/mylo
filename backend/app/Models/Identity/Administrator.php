@@ -70,11 +70,9 @@ class Administrator extends Model
     public function hasPermission($permission): bool
     {
         if (is_string($permission)) {
-            return $this->roles()
-                ->join('admin_role_permissions', 'admin_roles.id', '=', 'admin_role_permissions.admin_role_id')
-                ->join('admin_permissions', 'admin_permissions.id', '=', 'admin_role_permissions.admin_permission_id')
-                ->where('admin_permissions.slug', $permission)
-                ->exists();
+            return $this->roles()->with('permissions')->get()
+                ->flatMap->permissions
+                ->contains('slug', $permission);
         }
         return false;
     }

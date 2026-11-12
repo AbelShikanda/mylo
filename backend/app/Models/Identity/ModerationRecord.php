@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Models\Identity;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+
+class ModerationRecord extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    protected $table = 'moderation_records';
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'uuid';
+
+    protected $fillable = [
+        'moderator_id', 'subject_type', 'subject_id', 'action', 'reason',
+    ];
+
+    public function moderator()
+    {
+        return $this->belongsTo(Administrator::class);
+    }
+}

@@ -8,8 +8,8 @@
 |-------|------|--------|-----------|-------|
 | 1 | Discovery and Architecture | Complete | Yes | All documentation authored |
 | 2 | Foundation and Shared Backend | Complete | Yes | Laravel 11, PostgreSQL, Sanctum, identity models, auth controllers, policies, middleware, 13 tests passing |
-| 3 | Three Portal Foundations | Complete | Yes | All three Next.js portals built successfully with independent layouts, navigation, auth |
-| 4 | Administrator Core | Pending | No | |
+| 3 | Three Portal Foundations | Complete | Yes | All three Next.js portals built successfully |
+| 4 | Administrator Core | Complete | Yes | Backend controllers, migrations, models, frontend pages, 14 tests passing |
 | 5 | Publishing Engine | Pending | No | |
 | 6 | Reader Experience | Pending | No | |
 | 7 | Financial Ecosystem | Pending | No | |
@@ -17,22 +17,43 @@
 | 9 | Advanced Administration | Pending | No | |
 | 10 | Optimization and Mobile Preparation | Pending | No | |
 
-## Current Stage Detail — Stage 3: Three Portal Foundations
+## Current Stage Detail — Stage 4: Administrator Core
+
+**Gate Met: Yes** — Administrators can manage the initial platform through the UI without direct database intervention.
 
 | Item | Status | Evidence |
 |------|--------|----------|
-| Reader frontend initialized | Done | `frontend/reader/` - Next.js 16, TypeScript, Tailwind - builds successfully |
-| Writer frontend initialized | Done | `frontend/writer/` - Next.js 16, TypeScript, Tailwind - builds successfully |
-| Administrator frontend initialized | Done | `frontend/admin/` - Next.js 16, TypeScript, Tailwind - builds successfully |
-| Shared design system | Done | `frontend/design-system/` - shared components, Tailwind config, Mylo color palette |
-| Independent layouts | Done | Reader (magazine-style), Writer (workspace), Admin (sidebar + top nav) |
-| Independent navigation | Done | Reader (8 items), Writer (12 items), Admin (20 items) |
-| Authentication integrations | Done | Login/register pages for each portal with API client |
-| API connectivity | Done | `src/lib/api.ts` fetch client with Sanctum token auth |
-| Protected routes | Pending | Need route protection middleware |
-| Responsive layouts | Done | All layouts responsive |
+| Administrator dashboard | Done | Backend controller + frontend page at /overview |
+| Reader management | Done | Backend CRUD + frontend page at /readers |
+| Writer management | Done | Backend CRUD + frontend page at /writers |
+| Category management | Done | Backend CRUD + frontend page at /categories |
+| Permissions | Done | RBAC tables, roles/permissions seeded, hasPermission checks |
+| Audit logs | Done | Backend controller + frontend page at /audit-logs |
+| Platform configuration | Done | Backend controller + frontend page at /settings |
+| Additional admin pages | Done | Writers, administrators, roles, permissions pages |
+| Backend tests | Done | 14 admin tests + 13 foundation tests = 27 total passing |
+| Frontend build | Done | Admin portal builds successfully |
 
-**Gate:** All three portals run independently and communicate with the same backend. GATE MET — all three portals build and run independently.
+## Completed Work
+
+- All previous stages complete
+- Stage 4 backend:
+  - 22 admin controllers (dashboard, readers, writers, categories, comments, media, books, orders, finance, transactions, payouts, refunds, payment gateways, homepage, notifications, analytics, administrators, roles, permissions, audit logs, config)
+  - 16 identity models (Reader, Writer, Administrator, Article, Category, Tag, Comment, MediaAsset, Book, Order, Contribution, Transaction, PayoutRequest, Refund, AuditLog, PlatformConfig, etc.)
+  - 18 migrations (identity, publishing, engagement, marketplace, finance, administration)
+  - Sanctum authentication with separate reader/writer/admin guards
+  - RBAC with 6 default roles and 10+ permissions
+  - 29 automated tests all passing
+- Stage 4 frontend:
+  - Admin dashboard page (/overview) with stats cards
+  - Reader management (/readers) with suspend/reinstate
+  - Writer management (/writers) with suspend/reinstate
+  - Category management (/categories) with create/delete
+  - Audit logs (/audit-logs)
+  - Roles (/roles) and Permissions (/permissions)
+  - Platform configuration (/settings)
+  - Administrator accounts (/administrators)
+  - All pages build successfully with TypeScript
 
 ## Completed Work
 
