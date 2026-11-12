@@ -47,4 +47,9 @@ class Reader extends Model
     {
         return $this->hasOne(ReaderProfile::class, 'reader_id');
     }
+
+    public function hasPermission($permission): bool
+    {
+        return false;
+    }
 }

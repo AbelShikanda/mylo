@@ -4,16 +4,24 @@ namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Identity\Transaction;
+use App\Services\Finance\FinancialService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 
 class TransactionController extends Controller
 {
+    protected FinancialService $financialService;
+
+    public function __construct(FinancialService $financialService)
+    {
+        $this->financialService = $financialService;
+    }
+
     public function index(Request $request)
     {
         abort_unless($request->user()->hasPermission('finance.view'), 403);
 
-        $transactions = Transaction::orderBy('created_at', 'desc')->paginate(20);
+        $filters = $request->only(['status', 'type', 'writer_id']);
+        $transactions = $this->financialService->getTransactions($filters);
 
         return response()->json([
             'data' => $transactions->items(),

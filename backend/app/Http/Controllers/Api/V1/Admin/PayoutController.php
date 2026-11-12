@@ -4,17 +4,24 @@ namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Identity\PayoutRequest;
-use App\Models\Identity\AuditLog;
+use App\Services\Finance\FinancialService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 
 class PayoutController extends Controller
 {
+    protected FinancialService $financialService;
+
+    public function __construct(FinancialService $financialService)
+    {
+        $this->financialService = $financialService;
+    }
+
     public function index(Request $request)
     {
         abort_unless($request->user()->hasPermission('finance.payouts.manage'), 403);
 
-        $payouts = PayoutRequest::with('writer')->orderBy('created_at', 'desc')->paginate(20);
+        $filters = $request->only(['status']);
+        $payouts = $this->financialService->getPayoutRequests($filters);
 
         return response()->json([
             'data' => $payouts->items(),
@@ -29,40 +36,25 @@ class PayoutController extends Controller
         ]);
     }
 
-    public function approve(Request $request, PayoutRequest $payout)
+    public function approve(Request $request, PayoutRequest $payout, FinancialService $financialService)
     {
         abort_unless($request->user()->hasPermission('finance.payouts.manage'), 403);
 
-        $payout->update(['status' => 'approved', 'processed_at' => now()]);
-
-        AuditLog::create([
-            'administrator_id' => $request->user()->id,
-            'action' => 'approve_payout',
-            'subject_type' => PayoutRequest::class,
-            'subject_id' => $payout->id,
-            'new_values' => ['status' => 'approved'],
-            'ip' => $request->ip(),
-            'user_agent' => $request->userAgent(),
+        $validated = $request->validate([
+            'provider' => 'nullable|string',
+            'reference' => 'nullable|string',
         ]);
 
-        return response()->json(['message' => 'Payout approved']);
+        $record = $financialService->approvePayout($payout, $validated);
+
+        return response()->json(['message' => 'Payout approved', 'data' => $record]);
     }
 
-    public function reject(Request $request, PayoutRequest $payout)
+    public function reject(Request $request, PayoutRequest $payout, FinancialService $financialService)
     {
         abort_unless($request->user()->hasPermission('finance.payouts.manage'), 403);
 
-        $payout->update(['status' => 'rejected']);
-
-        AuditLog::create([
-            'administrator_id' => $request->user()->id,
-            'action' => 'reject_payout',
-            'subject_type' => PayoutRequest::class,
-            'subject_id' => $payout->id,
-            'new_values' => ['status' => 'rejected'],
-            'ip' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
+        $financialService->rejectPayout($payout);
 
         return response()->json(['message' => 'Payout rejected']);
     }

@@ -47,4 +47,9 @@ class Writer extends Model
     {
         return $this->hasOne(WriterProfile::class, 'writer_id');
     }
+
+    public function hasPermission($permission): bool
+    {
+        return false;
+    }
 }

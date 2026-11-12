@@ -19,7 +19,7 @@ use App\Http\Controllers\Api\V1\Writer\AnalyticsController;
 | Guard: auth:sanctum,writer
 */
 
-Route::prefix('writer')->middleware('auth:sanctum')->group(function () {
+Route::prefix('writer')->middleware('auth:sanctum,writer')->group(function () {
     // Profile
     Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -57,9 +57,13 @@ Route::prefix('writer')->middleware('auth:sanctum')->group(function () {
     // Financial support
     Route::post('support/activate', [FinancialSupportController::class, 'activate'])->name('support.activate');
     Route::post('support/deactivate', [FinancialSupportController::class, 'deactivate'])->name('support.deactivate');
+    Route::post('support/recurring', [FinancialSupportController::class, 'createRecurring'])->name('support.recurring');
+    Route::delete('support/recurring/{supportId}', [FinancialSupportController::class, 'cancelRecurring'])->name('support.recurring.cancel');
 
     // Earnings
     Route::get('earnings', [EarningsController::class, 'index'])->name('earnings.index');
+    Route::post('earnings/payout-request', [EarningsController::class, 'requestPayout'])->name('earnings.payout-request');
+    Route::get('earnings/payouts', [EarningsController::class, 'getPayouts'])->name('earnings.payouts');
 
     // Analytics
     Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics.index');

@@ -16,6 +16,12 @@ use App\Http\Controllers\Api\V1\Public\CheckoutController;
 | Accessible without authentication.
 */
 
+// Payment webhooks
+Route::prefix('webhooks')->group(function () {
+    Route::post('payment/mpesa', [\App\Http\Controllers\Api\V1\Payment\WebhookController::class, 'mpesa'])->name('webhooks.mpesa');
+    Route::post('payment/stripe', [\App\Http\Controllers\Api\V1\Payment\WebhookController::class, 'stripe'])->name('webhooks.stripe');
+});
+
 // Articles
 Route::get('articles', [ArticleController::class, 'index'])->name('articles.index');
 Route::get('articles/{slug}', [ArticleController::class, 'show'])->name('articles.show');

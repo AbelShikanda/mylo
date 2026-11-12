@@ -19,7 +19,7 @@ use App\Http\Controllers\Api\V1\Reader\OrderController;
 | Guard: auth:sanctum
 */
 
-Route::prefix('reader')->middleware('auth:sanctum')->group(function () {
+Route::prefix('reader')->middleware('auth:sanctum,reader')->group(function () {
     // Profile
     Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -52,6 +52,7 @@ Route::prefix('reader')->middleware('auth:sanctum')->group(function () {
     // Contributions (financial support)
     Route::get('contributions', [ContributionController::class, 'index'])->name('contributions.index');
     Route::post('contributions', [ContributionController::class, 'store'])->name('contributions.store');
+    Route::post('contributions/initiate-payment', [ContributionController::class, 'initiatePayment'])->name('contributions.initiate-payment');
 
     // Library (purchased ebooks)
     Route::get('library', [LibraryController::class, 'index'])->name('library.index');

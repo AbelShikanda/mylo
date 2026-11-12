@@ -4,17 +4,24 @@ namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Identity\Refund;
-use App\Models\Identity\AuditLog;
+use App\Services\Finance\FinancialService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 
 class RefundController extends Controller
 {
+    protected FinancialService $financialService;
+
+    public function __construct(FinancialService $financialService)
+    {
+        $this->financialService = $financialService;
+    }
+
     public function index(Request $request)
     {
         abort_unless($request->user()->hasPermission('finance.refunds.manage'), 403);
 
-        $refunds = Refund::with('transaction')->orderBy('created_at', 'desc')->paginate(20);
+        $filters = $request->only(['status']);
+        $refunds = $this->financialService->getRefunds($filters);
 
         return response()->json([
             'data' => $refunds->items(),
@@ -29,40 +36,20 @@ class RefundController extends Controller
         ]);
     }
 
-    public function approve(Request $request, Refund $refund)
+    public function approve(Request $request, Refund $refund, FinancialService $financialService)
     {
         abort_unless($request->user()->hasPermission('finance.refunds.manage'), 403);
 
-        $refund->update(['status' => 'approved', 'processed_at' => now()]);
-
-        AuditLog::create([
-            'administrator_id' => $request->user()->id,
-            'action' => 'approve_refund',
-            'subject_type' => Refund::class,
-            'subject_id' => $refund->id,
-            'new_values' => ['status' => 'approved'],
-            'ip' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
+        $financialService->approveRefund($refund);
 
         return response()->json(['message' => 'Refund approved']);
     }
 
-    public function reject(Request $request, Refund $refund)
+    public function reject(Request $request, Refund $refund, FinancialService $financialService)
     {
         abort_unless($request->user()->hasPermission('finance.refunds.manage'), 403);
 
-        $refund->update(['status' => 'rejected']);
-
-        AuditLog::create([
-            'administrator_id' => $request->user()->id,
-            'action' => 'reject_refund',
-            'subject_type' => Refund::class,
-            'subject_id' => $refund->id,
-            'new_values' => ['status' => 'rejected'],
-            'ip' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
+        $financialService->rejectRefund($refund);
 
         return response()->json(['message' => 'Refund rejected']);
     }

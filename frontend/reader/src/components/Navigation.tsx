@@ -11,6 +11,7 @@ const readerNav = [
   { name: 'Articles', href: '/articles' },
   { name: 'Books', href: '/books' },
   { name: 'Likes', href: '/likes' },
+  { name: 'Contributions', href: '/contributions' },
   { name: 'Saved', href: '/bookmarks' },
   { name: 'Reading History', href: '/reading-history' },
   { name: 'My Library', href: '/library' },
