@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme {
+  --color-burgundy-deep: #350E1C;
+  --color-burgundy-dark: #501629;
+  --color-burgundy-wine: #702B43;
+  --color-rose-muted: #A56D7D;
+  --color-champagne: #D8BC9A;
+  --color-ivory-soft: #EDE3D8;
+  --color-charcoal: #171316;
+  --color-grey-muted: #9C9295;
+}
+
+@font-face {
+  font-family: "Editorial Serif";
+  src: local("Times New Roman"), local("Georgia"), serif;
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Editorial Sans";
+  src: local("Helvetica"), local("Arial"), sans-serif;
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  background: var(--color-charcoal);
+  color: var(--color-ivory-soft);
+  font-family: "Editorial Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Editorial Serif", Georgia, "Times New Roman", serif;
+  color: var(--color-champagne);
+}
+
+a {
+  color: var(--color-champagne);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+a:hover {
+  color: var(--color-burgundy-wine);
+}
