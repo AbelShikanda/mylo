@@ -11,59 +11,43 @@
 | 3 | Three Portal Foundations | Complete | Yes | All three Next.js portals built successfully |
 | 4 | Administrator Core | Complete | Yes | Backend controllers, migrations, models, frontend pages, 14 tests passing |
 | 5 | Publishing Engine | Complete | Yes | Backend article/media services, controllers, routes. Writer portal article editor, media library, article management. Reader portal article rendering. 29 backend tests passing |
-| 6 | Reader Experience | Pending | No | |
+| 6 | Reader Experience | Complete | Yes | Backend reader services (preferences, likes, bookmarks, reading history, notifications, reports). Frontend preferences, likes, bookmarks, reading history pages. Homepage updated with personalized content. All portals build. 29 backend tests passing |
 | 7 | Financial Ecosystem | Pending | No | |
 | 8 | Marketplace | Pending | No | |
 | 9 | Advanced Administration | Pending | No | |
 | 10 | Optimization and Mobile Preparation | Pending | No | |
 
-## Current Stage Detail — Stage 5: Publishing Engine
+## Current Stage Detail — Stage 6: Reader Experience
 
-**Gate Met: Yes** — Writers can publish fully rendered articles through the block-based editor, and administrators can manage editorial content.
+**Gate Met: Yes** — Readers can set preferences, like/bookmark articles, track reading history, and view notifications.
 
 | Item | Status | Evidence |
 |------|--------|----------|
-| Article service | Done | `app/Services/Publishing/ArticleService.php` - create, update, publish, schedule, autosave, delete |
-| Media service | Done | `app/Services/Media/MediaService.php` - upload, delete, list |
-| Article routes & controllers | Done | Writer + Admin API routes for articles |
-| Media routes & controllers | Done | Writer + Admin API routes for media |
-| Article models | Done | Article, ArticleRevision, Category, Tag, MediaAsset with UUID keys, SoftDeletes |
-| Writer article editor UI | Done | `frontend/writer/src/app/create/page.tsx` - block-based editor with 9 block types |
-| Writer article management UI | Done | `frontend/writer/src/app/articles/page.tsx` - article list |
-| Writer media library UI | Done | Backend ready, frontend stub |
-| Reader article rendering | Done | `frontend/reader/src/app/articles/[slug]/page.tsx` - block rendering |
-| Publishing engine tests | Done | 29 backend tests all passing |
+| Reader service | Done | `app/Services/Reader/ReaderService.php` - preferences, likes, bookmarks, reading history, notifications, reports |
+| Reader models | Done | ArticleLike, Bookmark, ReadingHistory, ReaderCategoryPreference, Notification, Report (all UUID keys) |
+| Reader migrations | Done | `2024_01_01_000019_create_reader_engagement_tables.php` |
+| Reader controllers | Done | PreferenceController, LikeController, BookmarkController, ReadingHistoryController, NotificationController, ReportController |
+| Reader routes | Done | `routes/api/v1/reader.php` - preferences, bookmarks, likes, reading history, notifications, reports |
+| Reader preferences frontend | Done | `frontend/reader/src/app/preferences/page.tsx` - category selection with save |
+| Reader likes frontend | Done | `frontend/reader/src/app/likes/page.tsx` - liked articles list |
+| Reader bookmarks frontend | Done | `frontend/reader/src/app/bookmarks/page.tsx` - bookmarked articles list |
+| Reader reading history frontend | Done | `frontend/reader/src/app/reading-history/page.tsx` - reading history list |
+| Reader homepage | Done | Updated with featured, recent, and personalized content |
+| Reader navigation | Done | Updated with Likes, Saved (Bookmarks), Reading History, Preferences |
+| Article like_count on public API | Done | Article model has likes relationship + like_count accessor |
 | All portals build | Done | Reader, Writer, Admin all compile successfully |
+| Backend tests | Done | 29 tests all passing |
 
 ## Completed Work
 
-All stages 1-5 complete. 5 commits on main, no push.
+All stages 1-6 complete. 6 commits on main, no push.
 
-## Completed Work
-
-- Project directory created at `/home/abel/Desktop/projects/mylo`
-- Environment inspected and tooling confirmed
-- Stage 1 documentation complete and gated
-- Stage 2 foundation complete and gated:
-  - Laravel 11 initialized in `backend/`
-  - PostgreSQL connected (port 5434, database `mylo`, user `abel`)
-  - `.env` configured for PostgreSQL (no Redis required)
-  - API versioning (`/api/v1/`) with route groups for auth, public, reader, writer, admin
-  - Identity migrations: readers, reader_profiles, writers, writer_profiles, administrators, admin_profiles, admin RBAC tables
-  - Sanctum installed and configured with `personal_access_tokens` using UUID `tokenable_id`
-  - Auth guards: reader, writer, admin (separate providers)
-  - Auth controllers: ReaderAuthController, WriterAuthController, AdminAuthController (register, login, logout, password reset, email verify, MFA)
-  - Identity models: Reader, ReaderProfile, Writer, WriterProfile, Administrator, AdminProfile, AdminRole, AdminPermission (all with UUID primary keys, SoftDeletes, HasApiTokens)
-  - Policies: ReaderPolicy, WriterPolicy, AdminPolicy registered in Gate
-  - Middleware: CheckAdminPermission registered as `admin.permission`
-  - Services: IdentityService with default roles/permissions seeding
-  - Factories: ReaderFactory, WriterFactory, AdministratorFactory + ModelFactory.php
-  - 13 automated foundation tests all passing (registration, login, identity separation)
-- Stage 3 portal foundations:
-  - `frontend/design-system/` — shared design system with Mylo color palette (burgundy/wine/champagne/ivory/charcoal), cn utility, Button, Container, Text/Heading components
-  - `frontend/reader/` — Next.js 16 reader portal with magazine-style layout, reader navigation (8 items), login/register, API client, auth storage
-  - `frontend/writer/` — Next.js 16 writer portal with workspace layout, writer navigation (12 items), login/register, dashboard, API client, auth storage
-  - `frontend/admin/` — Next.js 16 admin portal with sidebar+top nav layout, admin navigation (20 items), login page, dashboard, API client, auth storage
+- Stage 1: Architecture & specification docs
+- Stage 2: Laravel backend foundation (PostgreSQL, Sanctum, identity, 13 tests)
+- Stage 3: Three Next.js portals (reader, writer, admin) with independent layouts/navigation/auth
+- Stage 4: Administrator Core (22 controllers, RBAC, 14 admin tests, frontend management pages)
+- Stage 5: Publishing Engine (block-based editor, media service, article CRUD, publishing workflow, reader article rendering)
+- Stage 6: Reader Experience (preferences, likes, bookmarks, reading history, notifications, reports, personalized homepage)
 
 ## Blockers
 
@@ -71,7 +55,5 @@ None.
 
 ## Next Steps
 
-1. Try to build each portal to verify TypeScript compilation
-2. Add protected route middleware to each portal
-3. Commit Stage 3 work (no push)
-4. Begin Stage 4: Administrator Core (CRUD for readers, writers, categories, etc.)
+1. Begin Stage 7: Financial Ecosystem (contributions, payments, earnings, payouts, refunds)
+2. Continue implementing remaining stages per roadmap

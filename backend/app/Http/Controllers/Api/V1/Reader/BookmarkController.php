@@ -3,10 +3,56 @@
 namespace App\Http\Controllers\Api\V1\Reader;
 
 use App\Http\Controllers\Controller;
+use App\Models\Identity\Article;
+use App\Models\Identity\Reader;
+use App\Services\Reader\ReaderService;
+use Illuminate\Http\Request;
 
 class BookmarkController extends Controller
 {
-    public function index() { return response()->json(['data' => []]); }
-    public function store($article) { return response()->json(['message' => 'bookmarked']); }
-    public function destroy($article) { return response()->json(['message' => 'unbookmarked']); }
+    protected ReaderService $readerService;
+
+    public function __construct(ReaderService $readerService)
+    {
+        $this->readerService = $readerService;
+    }
+
+    public function index(Request $request, ReaderService $readerService)
+    {
+        /** @var Reader $reader */
+        $reader = $request->user('reader');
+        if (! $reader) {
+            abort(404);
+        }
+
+        $bookmarks = $readerService->getBookmarks($reader);
+
+        return response()->json(['data' => $bookmarks]);
+    }
+
+    public function toggle(Request $request, Article $article, ReaderService $readerService)
+    {
+        /** @var Reader $reader */
+        $reader = $request->user('reader');
+        if (! $reader) {
+            abort(404);
+        }
+
+        $result = $readerService->toggleBookmark($reader, $article->id);
+
+        return response()->json(['data' => $result]);
+    }
+
+    public function isBookmarked(Request $request, Article $article, ReaderService $readerService)
+    {
+        /** @var Reader $reader */
+        $reader = $request->user('reader');
+        if (! $reader) {
+            abort(404);
+        }
+
+        $bookmarked = $readerService->isBookmarked($reader, $article->id);
+
+        return response()->json(['data' => ['bookmarked' => $bookmarked]]);
+    }
 }

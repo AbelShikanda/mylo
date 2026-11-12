@@ -3,51 +3,83 @@
 namespace App\Http\Controllers\Api\V1\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\Identity\Article;
+use App\Models\Identity\Category;
+use App\Models\Identity\Tag;
 
 class ArticleController extends Controller
 {
-    public function index() { return response()->json(['data' => []]); }
-    public function show($slug) { return response()->json(['data' => null]); }
-    public function like($article) { return response()->json(['message' => 'liked']); }
-    public function unlike($article) { return response()->json(['message' => 'unliked']); }
-    public function comments($article) { return response()->json(['data' => []]); }
-    public function addComment($article) { return response()->json(['message' => 'comment added']); }
-    public function report($article) { return response()->json(['message' => 'reported']); }
-    public function related($article) { return response()->json(['data' => []]); }
-}
+    public function index()
+    {
+        $articles = Article::where('status', 'published')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->with('writer', 'category', 'tags')
+            ->orderBy('published_at', 'desc')
+            ->paginate(20);
 
-class CategoryController extends Controller
-{
-    public function index() { return response()->json(['data' => []]); }
-    public function show($slug) { return response()->json(['data' => null]); }
-    public function articles($category) { return response()->json(['data' => []]); }
-}
+        return response()->json([
+            'data' => $articles->items(),
+            'meta' => [
+                'pagination' => [
+                    'current_page' => $articles->currentPage(),
+                    'last_page' => $articles->lastPage(),
+                    'per_page' => $articles->perPage(),
+                    'total' => $articles->total(),
+                ],
+            ],
+        ]);
+    }
 
-class TagController extends Controller
-{
-    public function index() { return response()->json(['data' => []]); }
-    public function show($slug) { return response()->json(['data' => null]); }
-}
+    public function show($slug)
+    {
+        $article = Article::where('slug', $slug)
+            ->where('status', 'published')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->with('writer', 'category', 'tags', 'likes')
+            ->first();
 
-class SearchController extends Controller
-{
-    public function search() { return response()->json(['data' => []]); }
-}
+        if (! $article) {
+            return response()->json(['data' => null], 404);
+        }
 
-class BookController extends Controller
-{
-    public function index() { return response()->json(['data' => []]); }
-    public function show($slug) { return response()->json(['data' => null]); }
-}
+        return response()->json(['data' => $article->append('like_count')]);
+    }
 
-class CartController extends Controller
-{
-    public function show() { return response()->json(['data' => []]); }
-    public function addItem() { return response()->json(['message' => 'added']); }
-    public function removeItem($item) { return response()->json(['message' => 'removed']); }
-}
+    public function comments($article)
+    {
+        $comments = \App\Models\Identity\Comment::where('article_id', $article->id)
+            ->where('is_approved', true)
+            ->whereNull('parent_id')
+            ->with('replies')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-class CheckoutController extends Controller
-{
-    public function checkout() { return response()->json(['message' => 'checkout']); }
+        return response()->json(['data' => $comments]);
+    }
+
+    public function addComment($article)
+    {
+        return response()->json(['message' => 'comment added']);
+    }
+
+    public function report($article)
+    {
+        return response()->json(['message' => 'reported']);
+    }
+
+    public function related($article)
+    {
+        $related = Article::where('status', 'published')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->where('category_id', $article->category_id)
+            ->where('id', '!=', $article->id)
+            ->with('writer', 'category')
+            ->limit(5)
+            ->get();
+
+        return response()->json(['data' => $related]);
+    }
 }

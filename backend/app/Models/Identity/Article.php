@@ -68,4 +68,14 @@ class Article extends Model
     {
         return $this->hasMany(Comment::class);
     }
+
+    public function likes()
+    {
+        return $this->hasMany(ArticleLike::class);
+    }
+
+    public function getLikeCountAttribute(): int
+    {
+        return $this->likes()->count();
+    }
 }

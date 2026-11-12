@@ -3,44 +3,53 @@
 namespace App\Http\Controllers\Api\V1\Reader;
 
 use App\Http\Controllers\Controller;
+use App\Models\Identity\Reader;
+use App\Services\Reader\ReaderService;
+use Illuminate\Http\Request;
 
 class PreferenceController extends Controller
 {
-    public function show() { return response()->json(['data' => []]); }
-    public function update() { return response()->json(['message' => 'updated']); }
-}
+    protected ReaderService $readerService;
 
-class BookmarkController extends Controller
-{
-    public function index() { return response()->json(['data' => []]); }
-    public function store($article) { return response()->json(['message' => 'bookmarked']); }
-    public function destroy($article) { return response()->json(['message' => 'unbookmarked']); }
-}
+    public function __construct(ReaderService $readerService)
+    {
+        $this->readerService = $readerService;
+    }
 
-class ReadingHistoryController extends Controller
-{
-    public function index() { return response()->json(['data' => []]); }
-}
+    public function show(Request $request)
+    {
+        /** @var Reader $reader */
+        $reader = $request->user('reader');
+        if (! $reader) {
+            abort(404);
+        }
 
-class NotificationController extends Controller
-{
-    public function index() { return response()->json(['data' => []]); }
-    public function markAsRead($notification) { return response()->json(['message' => 'read']); }
-}
+        $preferences = $this->readerService->getPreferences($reader);
+        $allCategories = $this->readerService->getAllCategories();
 
-class ContributionController extends Controller
-{
-    public function index() { return response()->json(['data' => []]); }
-    public function store() { return response()->json(['message' => 'contributed']); }
-}
+        return response()->json([
+            'data' => [
+                'selected' => $preferences,
+                'all' => $allCategories,
+            ],
+        ]);
+    }
 
-class LibraryController extends Controller
-{
-    public function index() { return response()->json(['data' => []]); }
-}
+    public function update(Request $request, ReaderService $readerService)
+    {
+        /** @var Reader $reader */
+        $reader = $request->user('reader');
+        if (! $reader) {
+            abort(404);
+        }
 
-class OrderController extends Controller
-{
-    public function index() { return response()->json(['data' => []]); }
-    public function show($order) { return response()->json(['data' => null]); }
+        $validated = $request->validate([
+            'category_ids' => 'required|array',
+            'category_ids.*' => 'uuid|exists:categories,id',
+        ]);
+
+        $readerService->updatePreferences($reader, $validated['category_ids']);
+
+        return response()->json(['message' => 'Preferences updated']);
+    }
 }

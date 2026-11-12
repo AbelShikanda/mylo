@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Models\Identity;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+
+class ReaderCategoryPreference extends Model
+{
+    use HasFactory;
+
+    protected $table = 'reader_category_preferences';
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'uuid';
+
+    protected static function booted(): void
+    {
+        static::creating(function ($model) {
+            if (empty($model->id)) {
+                $model->id = (string) Str::uuid();
+            }
+        });
+    }
+
+    protected $fillable = ['reader_id', 'category_id'];
+
+    public function reader()
+    {
+        return $this->belongsTo(Reader::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+}
