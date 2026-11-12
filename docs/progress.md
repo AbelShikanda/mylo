@@ -6,8 +6,8 @@
 
 | Stage | Name | Status | Gate Met? | Notes |
 |-------|------|--------|-----------|-------|
-| 1 | Discovery and Architecture | Complete | Yes | All documentation authored: task.md, decisions.md, goals.md, agents.md, architecture.md, api-contracts.md, database-schema.md, progress.md |
-| 2 | Foundation and Shared Backend | Active | No | Next: initialize Laravel, connect PostgreSQL, migrations, auth, permissions |
+| 1 | Discovery and Architecture | Complete | Yes | All documentation authored |
+| 2 | Foundation and Shared Backend | Complete | Yes | Laravel 11, PostgreSQL, Sanctum, identity models, auth controllers, policies, middleware, 13 tests passing |
 | 3 | Three Portal Foundations | Pending | No | |
 | 4 | Administrator Core | Pending | No | |
 | 5 | Publishing Engine | Pending | No | |
@@ -17,45 +17,40 @@
 | 9 | Advanced Administration | Pending | No | |
 | 10 | Optimization and Mobile Preparation | Pending | No | |
 
-## Current Stage Detail — Stage 2: Foundation and Shared Backend
+## Current Stage Detail — Stage 3: Three Portal Foundations
 
 | Item | Status | Evidence |
 |------|--------|----------|
-| Laravel initialized | Pending | |
-| PostgreSQL connected | Pending | |
-| Environment configuration | Pending | |
-| API versioning | Pending | |
-| Database migrations | Pending | |
-| Identity models | Pending | |
-| Authentication | Pending | |
-| Authorization | Pending | |
-| Permissions | Pending | |
-| Shared services | Pending | |
-| API documentation | Pending | |
-| Automated foundation tests | Pending | |
+| Reader frontend initialized | Pending | |
+| Writer frontend initialized | Pending | |
+| Administrator frontend initialized | Pending | |
+| Shared design system | Pending | |
+| Independent layouts | Pending | |
+| Independent navigation | Pending | |
+| Authentication integrations | Pending | |
+| API connectivity | Pending | |
+| Protected routes | Pending | |
+| Responsive layouts | Pending | |
 
-**Gate:** Backend starts successfully, database migrations run, authentication works, and permissions are tested.
+**Gate:** All three portals run independently and communicate with the same backend.
 
 ## Completed Work
 
 - Project directory created at `/home/abel/Desktop/projects/mylo`
 - Environment inspected and tooling confirmed
 - Stage 1 documentation complete and gated
-- `docs/task.md` — master task and implementation specification with checkboxes
-- `docs/decisions.md` — architectural decisions log
-- `docs/goals.md` — project goals and success criteria
-- `docs/agents.md` — agent definitions and ownership
-- `docs/architecture.md` — system architecture and module boundaries
-- `docs/api-contracts.md` — REST API endpoint specification
-- `docs/database-schema.md` — database schema and ERD outline
-- `docs/progress.md` — this progress tracker
-
-## Blockers
-
-None.
-
-## Next Steps
-
-1. Initialize git repository and make single commit to main (no push).
-2. Begin Stage 2: initialize Laravel backend, connect PostgreSQL, run migrations, implement authentication and authorization.
-3. Record stage transitions here as each gate is met.
+- Stage 2 foundation complete and gated:
+  - Laravel 11 initialized in `backend/`
+  - PostgreSQL connected (port 5434, database `mylo`, user `abel`)
+  - `.env` configured for PostgreSQL (no Redis required)
+  - API versioning (`/api/v1/`) with route groups for auth, public, reader, writer, admin
+  - Identity migrations: readers, writer_profiles, writers, writer_profiles, administrators, admin_profiles, admin RBAC tables
+  - Sanctum installed and configured with `personal_access_tokens` using UUID `tokenable_id`
+  - Auth guards: reader, writer, admin (separate providers)
+  - Auth controllers: ReaderAuthController, WriterAuthController, AdminAuthController (register, login, logout, password reset, email verify, MFA)
+  - Identity models: Reader, ReaderProfile, Writer, WriterProfile, Administrator, AdminProfile, AdminRole, AdminPermission (all with UUID primary keys, SoftDeletes, HasApiTokens)
+  - Policies: ReaderPolicy, WriterPolicy, AdminPolicy registered in Gate
+  - Middleware: CheckAdminPermission registered as `admin.permission`
+  - Services: IdentityService with default roles/permissions seeding
+  - Factories: ReaderFactory, WriterFactory, AdministratorFactory + ModelFactory.php
+  - 13 automated foundation tests all passing (registration, login, identity separation)
