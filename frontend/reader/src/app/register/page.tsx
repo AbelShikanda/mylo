@@ -2,11 +2,22 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 import { RegisterReaderRequest } from '@/types/auth';
 
+interface RegisterResponse {
+  reader: {
+    id: string;
+    email: string;
+    display_name?: string;
+  };
+  token: string;
+}
+
 export default function RegisterPage() {
+  const router = useRouter();
   const [form, setForm] = useState<RegisterReaderRequest>({
     email: '',
     password: '',
@@ -21,14 +32,15 @@ export default function RegisterPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await apiClient.post<{ reader: any; token: string }>(
+      const response = await apiClient.post<RegisterResponse>(
         '/api/v1/auth/reader/register',
         form
       );
       authStorage.setToken(response.data.token);
-      window.location.href = '/';
-    } catch (err: any) {
-      setError(err.message || 'Registration failed');
+      router.push('/');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Registration failed';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -47,7 +59,7 @@ export default function RegisterPage() {
         </div>
       )}
 
-      <form onSubmit={onSubmit} className="space-y-4 bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm">
+      <form onSubmit={onSubmit} className="space-y-4 mylo-card p-6">
         <div>
           <label className="block text-sm font-medium text-charcoal mb-1">Email</label>
           <input
@@ -66,7 +78,7 @@ export default function RegisterPage() {
             name="password"
             type="password"
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-burgundy-wine"
-            placeholder="••••••••"
+            placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
           />
@@ -78,14 +90,14 @@ export default function RegisterPage() {
             name="password_confirmation"
             type="password"
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-burgundy-wine"
-            placeholder="••••••••"
+            placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
             value={form.password_confirmation}
             onChange={(e) => setForm({ ...form, password_confirmation: e.target.value })}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-charcoal mb-1">Display Name (optional)</label>
+          <label className="block text-sm font-medium text-charcoal mb-1">Display Name</label>
           <input
             name="display_name"
             type="text"
@@ -99,7 +111,7 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine disabled:opacity-60 transition-colors"
+          className="mylo-btn w-full justify-center"
         >
           {loading ? 'Creating account...' : 'Create account'}
         </button>

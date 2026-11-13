@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
+import './globals.css';
 import { ReaderLayout } from '@/components/Layout';
-import { initializeAuth } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Mylo - Reader Portal',
   description: 'Discover and enjoy premium independent digital magazine content.',
 };
-
-initializeAuth();
 
 export default function RootLayout({
   children,

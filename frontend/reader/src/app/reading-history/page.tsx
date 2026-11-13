@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapList } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 
 interface Article {
@@ -33,8 +33,7 @@ export default function ReadingHistoryPage() {
     apiClient
       .get<{ data: Article[] }>('/api/v1/reader/reading-history')
       .then((res) => {
-        const d = res.data as { data: Article[] };
-        setHistory(d.data);
+        setHistory(unwrapList<Article>(res));
         setLoading(false);
       })
       .catch((err) => {
@@ -86,7 +85,7 @@ export default function ReadingHistoryPage() {
           <p className="text-lg">No reading history yet.</p>
           <Link
             href="/"
-            className="mt-4 inline-block px-6 py-3 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine transition-colors"
+            className="mt-4 inline-block mylo-btn"
           >
             Browse articles
           </Link>
@@ -96,7 +95,7 @@ export default function ReadingHistoryPage() {
           {history.map((article) => (
             <div
               key={article.id}
-              className="bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm"
+              className="mylo-card p-6"
             >
               <div className="flex items-start gap-4">
                 {article.featured_image && (

@@ -48,6 +48,12 @@ class Reader extends Model
         return $this->hasOne(ReaderProfile::class, 'reader_id');
     }
 
+
+    public function getDisplayNameAttribute(): string
+    {
+        return $this->profile?->display_name ?? $this->email;
+    }
+
     public function hasPermission($permission): bool
     {
         return false;

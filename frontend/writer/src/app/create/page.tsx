@@ -426,8 +426,8 @@ export default function CreateArticlePage() {
         '/api/v1/writer/articles',
         form
       );
-      const res = response as unknown as { data: { data: { id: string } } };
-      window.location.href = `/articles/${res.data.data.id}`;
+      const res = response as unknown as { data: { id: string } };
+      window.location.href = `/articles`;
     } catch (err: any) {
       setError(err.message || 'Failed to create article');
       setLoading(false);
@@ -451,7 +451,7 @@ export default function CreateArticlePage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm">
+      <form onSubmit={handleSubmit} className="space-y-6 mylo-card p-6">
         <div>
           <label className="block text-sm font-medium text-charcoal mb-1">
             Title
@@ -462,7 +462,7 @@ export default function CreateArticlePage() {
             onChange={(e) =>
               setForm({ ...form, title: e.target.value })
             }
-            className="w-full px-3 py-2 border border-burgundy-deep/30 rounded-md focus:outline-none focus:ring-2 focus:ring-burgundy-wine"
+            className="mylo-input"
             placeholder="Article title"
           />
         </div>
@@ -477,7 +477,7 @@ export default function CreateArticlePage() {
             onChange={(e) =>
               setForm({ ...form, slug: e.target.value })
             }
-            className="w-full px-3 py-2 border border-burgundy-deep/30 rounded-md focus:outline-none focus:ring-2 focus:ring-burgundy-wine"
+            className="mylo-input"
             placeholder="my-article-slug"
           />
         </div>
@@ -493,7 +493,7 @@ export default function CreateArticlePage() {
               setForm({ ...form, excerpt: e.target.value })
             }
             rows={3}
-            className="w-full px-3 py-2 border border-burgundy-deep/30 rounded-md focus:outline-none focus:ring-2 focus:ring-burgundy-wine"
+            className="mylo-input"
             placeholder="Brief summary of the article"
           />
         </div>
@@ -583,7 +583,7 @@ export default function CreateArticlePage() {
               onChange={(e) =>
                 setForm({ ...form, status: e.target.value as ArticleForm['status'] })
               }
-              className="w-full px-3 py-2 border border-burgundy-deep/30 rounded-md focus:outline-none focus:ring-2 focus:ring-burgundy-wine"
+              className="mylo-input"
             >
               <option value="draft">Draft</option>
               <option value="published">Publish Now</option>
@@ -600,7 +600,7 @@ export default function CreateArticlePage() {
               onChange={(e) =>
                 setForm({ ...form, category_id: e.target.value })
               }
-              className="w-full px-3 py-2 border border-burgundy-deep/30 rounded-md focus:outline-none focus:ring-2 focus:ring-burgundy-wine"
+              className="mylo-input"
             >
               <option value="">No category</option>
             </select>
@@ -610,7 +610,7 @@ export default function CreateArticlePage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine disabled:opacity-60 transition-colors"
+          className="mylo-btn w-full justify-center"
         >
           {loading ? 'Saving…' : form.status === 'published' ? 'Publish Article' : 'Save Draft'}
         </button>

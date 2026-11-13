@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapData } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 
 export default function ConfigPage() {
@@ -17,9 +17,9 @@ export default function ConfigPage() {
     }
 
     apiClient
-      .get<Record<string, string>>('/api/v1/config')
+      .get<Record<string, string>>('/api/v1/admin/config')
       .then((res) => {
-        setConfig(res.data);
+        setConfig(unwrapData<Record<string, string>>(res) ?? {});
         setLoading(false);
       })
       .catch((err) => {
@@ -30,7 +30,7 @@ export default function ConfigPage() {
 
   const handleUpdate = async (key: string, value: string) => {
     try {
-      await apiClient.put(`/api/v1/config/${key}`, { value });
+      await apiClient.put(`/api/v1/admin/config/${key}`, { value });
       window.location.reload();
     } catch (err: any) {
       setError(err.message);
@@ -40,7 +40,7 @@ export default function ConfigPage() {
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto py-8 px-4">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-6">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-6">
           Loading Configuration...
         </h1>
       </div>
@@ -50,7 +50,7 @@ export default function ConfigPage() {
   if (error) {
     return (
       <div className="max-w-6xl mx-auto py-8 px-4">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-6">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-6">
           Error
         </h1>
         <p className="text-rose-muted">{error}</p>
@@ -61,7 +61,7 @@ export default function ConfigPage() {
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-2">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-2">
           Platform Configuration
         </h1>
       </div>
@@ -73,7 +73,7 @@ export default function ConfigPage() {
       )}
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="mylo-table">
           <thead>
             <tr className="border-b border-burgundy-wine/40 text-rose-muted text-sm uppercase">
               <th className="pb-3">Key</th>
@@ -92,7 +92,7 @@ export default function ConfigPage() {
                     onChange={(e) =>
                       handleUpdate(key, e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-burgundy-wine/30 rounded bg-charcoal/50 text-champagne focus:outline-none focus:ring-2 focus:ring-burgundy-wine"
+                    className="mylo-input"
                   />
                 </td>
                 <td className="py-4 text-right">

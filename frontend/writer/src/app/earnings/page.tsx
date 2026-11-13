@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapData, unwrapList } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 
 interface Earnings {
@@ -39,8 +39,7 @@ export default function EarningsPage() {
     apiClient
       .get<{ data: Earnings }>('/api/v1/writer/earnings')
       .then((res) => {
-        const d = res.data as { data: Earnings };
-        setEarnings(d.data);
+        setEarnings(unwrapData<Earnings>(res) ?? ({} as Earnings));
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -48,8 +47,7 @@ export default function EarningsPage() {
     apiClient
       .get<{ data: Payout[] }>('/api/v1/writer/earnings/payouts')
       .then((res) => {
-        const d = res.data as { data: Payout[] };
-        setPayouts(d.data);
+        setPayouts(unwrapList<Payout>(res));
       })
       .catch((err) => setError(err.message));
   }, []);
@@ -108,7 +106,7 @@ export default function EarningsPage() {
       )}
 
       <div className="grid md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm">
+        <div className="mylo-card p-6">
           <p className="text-xs text-charcoal/60 uppercase tracking-wider mb-2">
             Contributions Received
           </p>
@@ -116,7 +114,7 @@ export default function EarningsPage() {
             ${earnings?.contributions_received || '0.00'}
           </p>
         </div>
-        <div className="bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm">
+        <div className="mylo-card p-6">
           <p className="text-xs text-charcoal/60 uppercase tracking-wider mb-2">
             Available Balance
           </p>
@@ -124,7 +122,7 @@ export default function EarningsPage() {
             ${earnings?.available_balance || '0.00'}
           </p>
         </div>
-        <div className="bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm">
+        <div className="mylo-card p-6">
           <p className="text-xs text-charcoal/60 uppercase tracking-wider mb-2">
             Pending Balance
           </p>
@@ -132,7 +130,7 @@ export default function EarningsPage() {
             ${earnings?.pending_balance || '0.00'}
           </p>
         </div>
-        <div className="bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm">
+        <div className="mylo-card p-6">
           <p className="text-xs text-charcoal/60 uppercase tracking-wider mb-2">
             Withdrawn
           </p>
@@ -142,7 +140,7 @@ export default function EarningsPage() {
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm">
+      <div className="mylo-card p-6">
         <h3 className="font-serif font-bold text-burgundy-deep text-lg mb-4">
           Request Payout
         </h3>
@@ -158,7 +156,7 @@ export default function EarningsPage() {
               min="1"
               value={requestAmount}
               onChange={(e) => setRequestAmount(e.target.value)}
-              className="w-full px-3 py-2 border border-burgundy-deep/30 rounded-md focus:outline-none focus:ring-2 focus:ring-burgundy-wine"
+              className="mylo-input"
               placeholder="50.00"
               required
             />
@@ -172,7 +170,7 @@ export default function EarningsPage() {
         </form>
       </div>
 
-      <div className="bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm">
+      <div className="mylo-card p-6">
         <h3 className="font-serif font-bold text-burgundy-deep text-lg mb-4">
           Payout History
         </h3>

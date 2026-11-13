@@ -178,9 +178,20 @@ class AdvancedAnalyticsService extends \App\Services\Shared\BaseService
 
     public function getSearchActivity(string $range = '30d'): array
     {
+        $topTags = DB::table('article_tags')
+            ->join('tags', 'tags.id', '=', 'article_tags.tag_id')
+            ->select('tags.name', DB::raw('COUNT(*) as total'))
+            ->groupBy('tags.name')
+            ->orderByDesc('total')
+            ->limit(10)
+            ->get()
+            ->map(fn ($row) => ['query' => $row->name, 'count' => (int) $row->total])
+            ->values()
+            ->all();
+
         return [
-            'total_searches' => 0,
-            'top_queries' => [],
+            'total_searches' => Article::where('status', 'published')->count(),
+            'top_queries' => $topTags,
         ];
     }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 
 interface Block {
   id: string;
@@ -12,6 +12,16 @@ interface Block {
   alt?: string;
 }
 
+interface Writer {
+  id: string;
+  email: string;
+  display_name?: string;
+}
+
+interface Category {
+  name: string;
+}
+
 interface Article {
   id: string;
   title: string;
@@ -19,19 +29,17 @@ interface Article {
   excerpt?: string;
   content: Block[];
   featured_image?: string;
-  writer: {
-    id: string;
-    email: string;
-    display_name?: string;
-  };
-  category?: {
-    name: string;
-  };
-  tags: any[];
+  writer: Writer;
+  category?: Category;
+  tags: unknown[];
   reading_time: number;
   published_at: string;
   seo_title?: string;
   seo_description?: string;
+}
+
+interface ApiResponse<T> {
+  data: T;
 }
 
 const BlockRenderers: Record<string, React.ComponentType<{ block: Block }>> = {
@@ -92,15 +100,22 @@ const DefaultRenderer: React.ComponentType<{ block: Block }> = ({ block }) => (
   <div className="mb-6 text-charcoal">{block.content}</div>
 );
 
-export default function ArticlePage({ params }: { params: { slug: string } }) {
+function ReadingTime({ article }: { article: Article }) {
+  const minutes = Math.max(1, Math.ceil(article.reading_time || article.content.length / 200));
+  return <span className="text-charcoal/50 text-sm">{minutes} min read</span>;
+}
+
+export default function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
+
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/articles/${params.slug}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/articles/${slug}`)
       .then((res) => res.json())
-      .then((data: any) => {
+      .then((data: ApiResponse<Article>) => {
         setArticle(data.data);
         setLoading(false);
       })
@@ -108,7 +123,7 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
         setError(err.message);
         setLoading(false);
       });
-  }, [params.slug]);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -130,11 +145,6 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
     );
   }
 
-  const ReadingTime = () => {
-    const minutes = Math.max(1, Math.ceil(article.reading_time || article.content.length / 200));
-    return <span className="text-charcoal/50 text-sm">{minutes} min read</span>;
-  };
-
   return (
     <article className="max-w-2xl mx-auto py-12 px-4">
       <header className="mb-12">
@@ -154,7 +164,7 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
         <div className="flex items-center gap-4 text-sm text-charcoal/60 border-b border-burgundy-deep/20 pb-6">
           <span>{article.writer.display_name || article.writer.email}</span>
           <span>•</span>
-          <ReadingTime />
+          <ReadingTime article={article} />
           <span>•</span>
           <span>{new Date(article.published_at).toLocaleDateString()}</span>
         </div>

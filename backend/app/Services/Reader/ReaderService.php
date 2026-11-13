@@ -10,6 +10,7 @@ use App\Models\Identity\Notification;
 use App\Models\Identity\Reader;
 use App\Models\Identity\ReaderCategoryPreference;
 use App\Models\Identity\ReadingHistory;
+use App\Models\Identity\Report;
 use Illuminate\Support\Str;
 
 class ReaderService extends \App\Services\Shared\BaseService
@@ -59,13 +60,19 @@ class ReaderService extends \App\Services\Shared\BaseService
 
     public function toggleLike(Reader $reader, string $articleId): array
     {
-        $like = ArticleLike::where('reader_id', $reader->id)
+        $like = ArticleLike::withTrashed()
+            ->where('reader_id', $reader->id)
             ->where('article_id', $articleId)
             ->first();
 
-        if ($like) {
+        if ($like && ! $like->trashed()) {
             $like->delete();
             return ['liked' => false];
+        }
+
+        if ($like) {
+            $like->restore();
+            return ['liked' => true];
         }
 
         ArticleLike::create([
@@ -85,13 +92,19 @@ class ReaderService extends \App\Services\Shared\BaseService
 
     public function toggleBookmark(Reader $reader, string $articleId): array
     {
-        $bookmark = Bookmark::where('reader_id', $reader->id)
+        $bookmark = Bookmark::withTrashed()
+            ->where('reader_id', $reader->id)
             ->where('article_id', $articleId)
             ->first();
 
-        if ($bookmark) {
+        if ($bookmark && ! $bookmark->trashed()) {
             $bookmark->delete();
             return ['bookmarked' => false];
+        }
+
+        if ($bookmark) {
+            $bookmark->restore();
+            return ['bookmarked' => true];
         }
 
         Bookmark::create([

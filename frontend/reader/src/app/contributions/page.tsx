@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapList } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 
 interface Contribution {
@@ -30,8 +30,7 @@ export default function ContributionsPage() {
     apiClient
       .get<{ data: Contribution[] }>('/api/v1/reader/contributions')
       .then((res) => {
-        const d = res.data as { data: Contribution[] };
-        setContributions(d.data);
+        setContributions(unwrapList<Contribution>(res));
         setLoading(false);
       })
       .catch((err) => setError(err.message));
@@ -80,7 +79,7 @@ export default function ContributionsPage() {
           <p className="text-lg">No contributions yet.</p>
           <Link
             href="/"
-            className="mt-4 inline-block px-6 py-3 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine transition-colors"
+            className="mt-4 inline-block mylo-btn"
           >
             Browse writers
           </Link>

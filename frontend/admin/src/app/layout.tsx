@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
+import './globals.css';
 import { AdminLayout } from '@/components/Layout';
-import { initializeAuth } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Mylo - Administrator Portal',
   description: 'Platform control centre for managing the Mylo publishing ecosystem.',
 };
-
-initializeAuth();
 
 export default function RootLayout({
   children,

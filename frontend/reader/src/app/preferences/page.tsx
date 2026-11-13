@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapData } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 
 interface Category {
@@ -35,7 +35,8 @@ export default function PreferencesPage() {
     apiClient
       .get<{ data: PreferenceData }>('/api/v1/reader/preferences')
       .then((res) => {
-        const d = (res.data as unknown) as PreferenceData;
+        const d = unwrapData<PreferenceData>(res);
+        if (!d) { setLoading(false); return; }
         setData(d);
         setSelectedIds(d.selected.map((p) => p.category_id));
         setLoading(false);
@@ -67,12 +68,12 @@ export default function PreferencesPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSuccess(true);
-    } catch (err: any) {
-      setError(err.message || 'Failed to save preferences');
-    } finally {
-      setSaving(false);
-    }
-  };
+} catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to save preferences');
+      } finally {
+        setSaving(false);
+      }
+    };
 
   if (loading) {
     return (
@@ -104,7 +105,7 @@ export default function PreferencesPage() {
           Reading Preferences
         </h1>
         <p className="text-charcoal/70">
-          Select the categories you're interested in. We'll use these to
+          Select the categories you&apos;re interested in. We&apos;ll use these to
           personalize your homepage and recommendations.
         </p>
       </div>
@@ -121,7 +122,7 @@ export default function PreferencesPage() {
         </div>
       )}
 
-      <form onSubmit={handleSave} className="space-y-4 bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm">
+      <form onSubmit={handleSave} className="space-y-4 mylo-card p-6">
         <div className="grid md:grid-cols-3 gap-4">
           {data!.all.map((cat) => (
             <label
@@ -155,7 +156,7 @@ export default function PreferencesPage() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full py-3 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine disabled:opacity-60 transition-colors"
+          className="mylo-btn w-full justify-center"
         >
           {saving ? 'Saving…' : 'Save Preferences'}
         </button>

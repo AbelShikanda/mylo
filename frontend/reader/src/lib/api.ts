@@ -2,8 +2,8 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost
 
 export interface ApiResponse<T> {
   data: T;
-  meta?: { pagination?: any };
-  errors?: any[];
+  meta?: { pagination?: unknown };
+  errors?: unknown[];
 }
 
 class ApiClient {
@@ -32,8 +32,12 @@ class ApiClient {
       ...(options.headers as Record<string, string>),
     };
 
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
+    let token = this.token;
+    if (!token && typeof window !== 'undefined') {
+      token = window.localStorage.getItem('mylo_reader_token');
+    }
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
 
     const response = await fetch(url, {
@@ -53,7 +57,7 @@ class ApiClient {
     return this.request<T>(endpoint, { ...options, method: 'GET' });
   }
 
-  post<T>(endpoint: string, body?: any, options?: RequestInit) {
+  post<T>(endpoint: string, body?: unknown, options?: RequestInit) {
     return this.request<T>(endpoint, {
       ...options,
       method: 'POST',
@@ -61,7 +65,7 @@ class ApiClient {
     });
   }
 
-  put<T>(endpoint: string, body?: any, options?: RequestInit) {
+  put<T>(endpoint: string, body?: unknown, options?: RequestInit) {
     return this.request<T>(endpoint, {
       ...options,
       method: 'PUT',
@@ -75,3 +79,19 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);
+
+
+export function unwrapList<T>(body: unknown): T[] {
+  const d = (body as { data?: unknown } | null | undefined)?.data;
+  if (Array.isArray(d)) return d as T[];
+  if (d && Array.isArray((d as { data?: unknown[] }).data)) return (d as { data: T[] }).data;
+  return [];
+}
+
+export function unwrapData<T>(body: unknown): T | null {
+  const d = (body as { data?: unknown } | null | undefined)?.data;
+  if (d && !Array.isArray(d) && typeof d === 'object' && 'data' in (d as object)) {
+    return (d as { data: T }).data;
+  }
+  return (d ?? null) as T | null;
+}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapList } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 import { Category } from '@/types/auth';
 
@@ -23,9 +23,9 @@ export default function CategoriesPage() {
     }
 
     apiClient
-      .get<Category[]>('/api/v1/categories')
+      .get<Category[]>('/api/v1/admin/categories')
       .then((res) => {
-        setCategories(res.data);
+        setCategories(unwrapList<Category>(res));
         setLoading(false);
       })
       .catch((err) => {
@@ -37,7 +37,7 @@ export default function CategoriesPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiClient.post('/api/v1/categories', newCategory);
+      await apiClient.post('/api/v1/admin/categories', newCategory);
       setNewCategory({ name: '', slug: '', description: '' });
       window.location.reload();
     } catch (err: any) {
@@ -48,7 +48,7 @@ export default function CategoriesPage() {
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this category?')) return;
     try {
-      await apiClient.delete(`/api/v1/categories/${id}`);
+      await apiClient.delete(`/api/v1/admin/categories/${id}`);
       window.location.reload();
     } catch (err: any) {
       setError(err.message);
@@ -58,7 +58,7 @@ export default function CategoriesPage() {
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto py-8 px-4">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-6">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-6">
           Loading Categories...
         </h1>
       </div>
@@ -68,7 +68,7 @@ export default function CategoriesPage() {
   if (error) {
     return (
       <div className="max-w-6xl mx-auto py-8 px-4">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-6">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-6">
           Error
         </h1>
         <p className="text-rose-muted">{error}</p>
@@ -79,7 +79,7 @@ export default function CategoriesPage() {
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-2">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-2">
           Category Management
         </h1>
       </div>
@@ -90,8 +90,8 @@ export default function CategoriesPage() {
         </div>
       )}
 
-      <div className="bg-burgundy-deep/30 p-6 rounded-lg border border-burgundy-wine/40 mb-6">
-        <h3 className="font-serif font-bold text-champagne text-lg mb-4">
+      <div className="mylo-panel p-6 mb-6">
+        <h3 className="font-display font-bold text-champagne text-lg mb-4">
           Create Category
         </h3>
         <form onSubmit={handleCreate} className="space-y-4">
@@ -106,7 +106,7 @@ export default function CategoriesPage() {
                 onChange={(e) =>
                   setNewCategory({ ...newCategory, name: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-burgundy-wine/30 rounded bg-charcoal/50 text-champagne focus:outline-none focus:ring-2 focus:ring-burgundy-wine"
+                className="mylo-input"
                 placeholder="Food and Culinary"
               />
             </div>
@@ -120,7 +120,7 @@ export default function CategoriesPage() {
                 onChange={(e) =>
                   setNewCategory({ ...newCategory, slug: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-burgundy-wine/30 rounded bg-charcoal/50 text-champagne focus:outline-none focus:ring-2 focus:ring-burgundy-wine"
+                className="mylo-input"
                 placeholder="food-culinary"
               />
             </div>
@@ -137,14 +137,14 @@ export default function CategoriesPage() {
                     description: e.target.value,
                   })
                 }
-                className="w-full px-3 py-2 border border-burgundy-wine/30 rounded bg-charcoal/50 text-champagne focus:outline-none focus:ring-2 focus:ring-burgundy-wine"
+                className="mylo-input"
                 placeholder="Category description"
               />
             </div>
           </div>
           <button
             type="submit"
-            className="px-4 py-2 bg-burgundy-deep text-white text-sm font-medium rounded hover:bg-burgundy-wine transition-colors"
+            className="mylo-btn text-sm"
           >
             Create Category
           </button>
@@ -152,7 +152,7 @@ export default function CategoriesPage() {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="mylo-table">
           <thead>
             <tr className="border-b border-burgundy-wine/40 text-rose-muted text-sm uppercase">
               <th className="pb-3">Name</th>
@@ -174,7 +174,7 @@ export default function CategoriesPage() {
                 <td className="py-4 text-right">
                   <button
                     onClick={() => handleDelete(cat.id)}
-                    className="px-3 py-1 text-xs text-red-400 hover:bg-red-500/20 rounded transition-colors"
+                    className="px-2.5 py-1.5 text-xs font-semibold text-[#F46F6F] hover:bg-red-500/10 border border-red-500/20 rounded-lg transition-colors"
                   >
                     Delete
                   </button>

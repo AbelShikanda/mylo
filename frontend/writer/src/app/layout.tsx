@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
+import './globals.css';
 import { WriterLayout } from '@/components/Layout';
-import { initializeAuth } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Mylo - Writer Portal',
   description: 'Professional publishing workspace for independent writers.',
 };
-
-initializeAuth();
 
 export default function RootLayout({
   children,

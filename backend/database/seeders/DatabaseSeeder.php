@@ -7,11 +7,10 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
         app(IdentityService::class)->seedDefaultRolesAndPermissions();
+
+        $this->call(DemoSeeder::class);
     }
 }

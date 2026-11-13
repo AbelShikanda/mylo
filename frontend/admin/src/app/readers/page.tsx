@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapList } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 import { Reader } from '@/types/auth';
 
@@ -18,9 +18,9 @@ export default function ReadersPage() {
     }
 
     apiClient
-      .get<Reader[]>('/api/v1/readers')
+      .get<Reader[]>('/api/v1/admin/readers')
       .then((res) => {
-        setReaders(res.data);
+        setReaders(unwrapList<Reader>(res));
         setLoading(false);
       })
       .catch((err) => {
@@ -32,7 +32,7 @@ export default function ReadersPage() {
   const handleSuspend = async (id: string) => {
     if (!confirm('Suspend this reader?')) return;
     try {
-      await apiClient.post(`/api/v1/users/${id}/suspend`);
+      await apiClient.put(`/api/v1/admin/users/${id}/suspend`);
       setReaders(readers.map((r) => (r.id === id ? { ...r } : r)));
       window.location.reload();
     } catch (err: any) {
@@ -43,7 +43,7 @@ export default function ReadersPage() {
   const handleReinstate = async (id: string) => {
     if (!confirm('Reinstate this reader?')) return;
     try {
-      await apiClient.post(`/api/v1/users/${id}/reinstate`);
+      await apiClient.put(`/api/v1/admin/users/${id}/reinstate`);
       window.location.reload();
     } catch (err: any) {
       setError(err.message);
@@ -53,7 +53,7 @@ export default function ReadersPage() {
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto py-8 px-4">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-6">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-6">
           Loading Readers...
         </h1>
       </div>
@@ -63,7 +63,7 @@ export default function ReadersPage() {
   if (error) {
     return (
       <div className="max-w-6xl mx-auto py-8 px-4">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-6">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-6">
           Error
         </h1>
         <p className="text-rose-muted">{error}</p>
@@ -74,7 +74,7 @@ export default function ReadersPage() {
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-2">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-2">
           Reader Management
         </h1>
       </div>
@@ -86,7 +86,7 @@ export default function ReadersPage() {
       )}
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="mylo-table">
           <thead>
             <tr className="border-b border-burgundy-wine/40 text-rose-muted text-sm uppercase">
               <th className="pb-3">Email</th>
@@ -110,7 +110,7 @@ export default function ReadersPage() {
                 <td className="py-4 text-right space-x-2">
                   <button
                     onClick={() => handleSuspend(reader.id)}
-                    className="px-3 py-1 text-xs text-red-400 hover:bg-red-500/20 rounded transition-colors"
+                    className="px-2.5 py-1.5 text-xs font-semibold text-[#F46F6F] hover:bg-red-500/10 border border-red-500/20 rounded-lg transition-colors"
                   >
                     Suspend
                   </button>

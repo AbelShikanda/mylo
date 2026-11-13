@@ -25,8 +25,7 @@ class OrderService extends \App\Services\Shared\BaseService
             ]);
 
             foreach ($data['items'] as $item) {
-                OrderItem::create([
-                    'id' => (string) Str::uuid(),
+                $orderItem = OrderItem::create([
                     'order_id' => $order->id,
                     'book_id' => $item['book_id'],
                     'quantity' => $item['quantity'],
@@ -42,8 +41,7 @@ class OrderService extends \App\Services\Shared\BaseService
                 // Create digital access for ebooks
                 if ($book && $book->product_type === 'ebook') {
                     DigitalAccess::create([
-                        'id' => (string) Str::uuid(),
-                        'order_item_id' => $orderItem->id ?? (string) Str::uuid(),
+                        'order_item_id' => $orderItem->id,
                         'reader_id' => $reader->id,
                         'book_id' => $book->id,
                         'access_token' => (string) Str::uuid(),

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapList } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 
 interface Book {
@@ -34,8 +34,7 @@ export default function MyBooksPage() {
     apiClient
       .get<{ data: Book[] }>('/api/v1/writer/books')
       .then((res) => {
-        const d = res.data as { data: Book[] };
-        setBooks(d.data);
+        setBooks(unwrapList<Book>(res));
         setLoading(false);
       })
       .catch((err) => setError(err.message));
@@ -84,7 +83,7 @@ export default function MyBooksPage() {
           <p className="text-lg">No books yet.</p>
           <Link
             href="/"
-            className="mt-4 inline-block px-6 py-3 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine transition-colors"
+            className="mt-4 inline-block mylo-btn"
           >
             Publish your first book
           </Link>
@@ -94,7 +93,7 @@ export default function MyBooksPage() {
           {books.map((book) => (
             <div
               key={book.id}
-              className="bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm"
+              className="mylo-card p-6"
             >
               <div className="flex items-start gap-4">
                 {book.cover_image && (

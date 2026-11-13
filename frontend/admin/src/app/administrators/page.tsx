@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapList } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 import { Administrator } from '@/types/auth';
 
@@ -18,9 +18,9 @@ export default function AdministratorsPage() {
     }
 
     apiClient
-      .get<Administrator[]>('/api/v1/administrators')
+      .get<Administrator[]>('/api/v1/admin/administrators')
       .then((res) => {
-        setAdmins(res.data);
+        setAdmins(unwrapList<Administrator>(res));
         setLoading(false);
       })
       .catch((err) => {
@@ -32,7 +32,7 @@ export default function AdministratorsPage() {
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto py-8 px-4">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-6">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-6">
           Loading Administrators...
         </h1>
       </div>
@@ -42,7 +42,7 @@ export default function AdministratorsPage() {
   if (error) {
     return (
       <div className="max-w-6xl mx-auto py-8 px-4">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-6">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-6">
           Error
         </h1>
         <p className="text-rose-muted">{error}</p>
@@ -53,7 +53,7 @@ export default function AdministratorsPage() {
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-2">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-2">
           Administrator Accounts
         </h1>
       </div>
@@ -65,7 +65,7 @@ export default function AdministratorsPage() {
       )}
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="mylo-table">
           <thead>
             <tr className="border-b border-burgundy-wine/40 text-rose-muted text-sm uppercase">
               <th className="pb-3">Email</th>

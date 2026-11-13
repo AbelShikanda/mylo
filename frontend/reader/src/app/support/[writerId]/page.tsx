@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapData } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 
 interface Writer {
@@ -11,7 +11,8 @@ interface Writer {
   email: string;
 }
 
-export default function SupportPage({ params }: { params: { writerId: string } }) {
+export default function SupportPage({ params }: { params: Promise<{ writerId: string }> }) {
+  const { writerId } = use(params);
   const [writer, setWriter] = useState<Writer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,8 +24,7 @@ export default function SupportPage({ params }: { params: { writerId: string } }
     apiClient
       .get<{ data: Writer }>(`/api/v1/writer/profile`)
       .then((res) => {
-        const d = res.data as { data: Writer };
-        setWriter(d.data);
+        setWriter(unwrapData<Writer>(res));
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -40,7 +40,7 @@ export default function SupportPage({ params }: { params: { writerId: string } }
       await apiClient.post(
         '/api/v1/reader/contributions',
         {
-          writer_id: params.writerId,
+          writer_id: writerId,
           amount: parseFloat(amount),
           currency: 'KES',
           type: 'one-time',
@@ -48,9 +48,9 @@ export default function SupportPage({ params }: { params: { writerId: string } }
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSuccess(true);
-    } catch (err: any) {
-      setError(err.message || 'Failed to process contribution');
-    } finally {
+} catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to process contribution');
+      } finally {
       setSubmitting(false);
     }
   };
@@ -89,7 +89,7 @@ export default function SupportPage({ params }: { params: { writerId: string } }
       )}
 
       {writer && (
-        <div className="bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm">
+        <div className="mylo-card p-6">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-16 h-16 rounded-full bg-burgundy-deep/20 flex items-center justify-center">
               <span className="text-burgundy-deep font-bold text-xl">{writer.display_name?.charAt(0) || 'W'}</span>
@@ -114,7 +114,7 @@ export default function SupportPage({ params }: { params: { writerId: string } }
                 min="1"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full px-3 py-2 border border-burgundy-deep/30 rounded-md focus:outline-none focus:ring-2 focus:ring-burgundy-wine"
+                className="mylo-input"
                 placeholder="100.00"
                 required
               />
@@ -122,7 +122,7 @@ export default function SupportPage({ params }: { params: { writerId: string } }
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-3 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine disabled:opacity-60 transition-colors"
+              className="mylo-btn w-full justify-center"
             >
               {submitting ? 'Processing…' : 'Contribute'}
             </button>

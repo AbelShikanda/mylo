@@ -47,7 +47,7 @@ export default function RegisterPage() {
         </div>
       )}
 
-      <form onSubmit={onSubmit} className="space-y-4 bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm">
+      <form onSubmit={onSubmit} className="space-y-4 mylo-card p-6">
         <div>
           <label className="block text-sm font-medium text-charcoal mb-1">Email</label>
           <input
@@ -99,7 +99,7 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine disabled:opacity-60 transition-colors"
+          className="mylo-btn w-full justify-center"
         >
           {loading ? 'Creating account...' : 'Create account'}
         </button>

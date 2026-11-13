@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
 import { apiClient } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
@@ -19,69 +18,89 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await apiClient.post<{ administrator: any; token: string }>(
+      const response = await apiClient.post<{ administrator: unknown; token: string }>(
         '/api/v1/auth/admin/login',
         form
       );
       authStorage.setToken(response.data.token);
       window.location.href = '/overview';
-    } catch (err: any) {
-      setError(err.message || 'Login failed');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto py-12 px-4">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-serif font-bold text-burgundy-deep mb-2">Administrator Sign in</h1>
-        <p className="text-charcoal/70">Platform control centre — authorized access only</p>
-      </div>
-
-      {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded text-sm">
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={onSubmit} className="space-y-4 bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm">
-        <div>
-          <label className="block text-sm font-medium text-charcoal mb-1">Email</label>
-          <input
-            name="email"
-            type="email"
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-burgundy-wine"
-            placeholder="admin@example.com"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-          />
+    <div className="min-h-screen bg-charcoal text-ivory-soft flex items-center justify-center px-4">
+      <div className="w-full max-w-md space-y-6">
+        <div className="text-center">
+          <span className="text-champagne font-serif text-4xl font-bold">Mylo</span>
+          <h1 className="text-2xl font-display font-bold text-champagne mt-4">
+            Administrator Sign in
+          </h1>
+          <p className="text-rose-muted text-sm mt-2">
+            Platform control centre — authorized access only
+          </p>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-charcoal mb-1">Password</label>
-          <input
-            name="password"
-            type="password"
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-burgundy-wine"
-            placeholder="••••••••"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-          />
-        </div>
+        {error && (
+          <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded text-sm">
+            {error}
+          </div>
+        )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-3 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine disabled:opacity-60 transition-colors"
+        <form
+          onSubmit={onSubmit}
+          className="space-y-5 mylo-panel p-8"
         >
-          {loading ? 'Signing in...' : 'Sign in'}
-        </button>
-      </form>
+          <div>
+            <label htmlFor="email" className="mylo-label">
+              Email
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              autoComplete="username"
+              className="mylo-input"
+              placeholder="admin@mylo.test"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+          </div>
 
-      <p className="mt-6 text-center text-xs text-charcoal/50">
-        Administrator accounts are created by invitation only.
-      </p>
+          <div>
+            <label htmlFor="password" className="mylo-label">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              autoComplete="current-password"
+              className="mylo-input"
+              placeholder="••••••••"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 bg-champagne text-charcoal font-bold rounded hover:bg-ivory-soft disabled:opacity-60 transition-colors"
+          >
+            {loading ? 'Signing in…' : 'Sign in'}
+          </button>
+        </form>
+
+        <p className="text-center text-xs text-rose-muted">
+          Administrator accounts are created by invitation only.
+        </p>
+      </div>
     </div>
   );
 }

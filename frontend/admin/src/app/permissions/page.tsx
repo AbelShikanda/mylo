@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapList } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 import { Permission } from '@/types/auth';
 
@@ -18,9 +18,9 @@ export default function PermissionsPage() {
     }
 
     apiClient
-      .get<Permission[]>('/api/v1/permissions')
+      .get<Permission[]>('/api/v1/admin/permissions')
       .then((res) => {
-        setPermissions(res.data);
+        setPermissions(unwrapList<Permission>(res));
         setLoading(false);
       })
       .catch((err) => {
@@ -32,7 +32,7 @@ export default function PermissionsPage() {
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto py-8 px-4">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-6">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-6">
           Loading Permissions...
         </h1>
       </div>
@@ -42,7 +42,7 @@ export default function PermissionsPage() {
   if (error) {
     return (
       <div className="max-w-6xl mx-auto py-8 px-4">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-6">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-6">
           Error
         </h1>
         <p className="text-rose-muted">{error}</p>
@@ -53,7 +53,7 @@ export default function PermissionsPage() {
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-2">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-2">
           Permissions
         </h1>
       </div>
@@ -65,7 +65,7 @@ export default function PermissionsPage() {
       )}
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="mylo-table">
           <thead>
             <tr className="border-b border-burgundy-wine/40 text-rose-muted text-sm uppercase">
               <th className="pb-3">Permission Name</th>

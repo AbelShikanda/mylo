@@ -2,11 +2,22 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 import { LoginReaderRequest } from '@/types/auth';
 
+interface LoginResponse {
+  reader: {
+    id: string;
+    email: string;
+    display_name?: string;
+  };
+  token: string;
+}
+
 export default function LoginPage() {
+  const router = useRouter();
   const [form, setForm] = useState<LoginReaderRequest>({
     email: '',
     password: '',
@@ -19,14 +30,15 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await apiClient.post<{ reader: any; token: string }>(
+      const response = await apiClient.post<LoginResponse>(
         '/api/v1/auth/reader/login',
         form
       );
       authStorage.setToken(response.data.token);
-      window.location.href = '/';
-    } catch (err: any) {
-      setError(err.message || 'Login failed');
+      router.push('/');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Login failed';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -45,7 +57,7 @@ export default function LoginPage() {
         </div>
       )}
 
-      <form onSubmit={onSubmit} className="space-y-4 bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm">
+      <form onSubmit={onSubmit} className="space-y-4 mylo-card p-6">
         <div>
           <label className="block text-sm font-medium text-charcoal mb-1">Email</label>
           <input
@@ -64,7 +76,7 @@ export default function LoginPage() {
             name="password"
             type="password"
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-burgundy-wine"
-            placeholder="••••••••"
+            placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
           />
@@ -73,14 +85,14 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine disabled:opacity-60 transition-colors"
+          className="mylo-btn w-full justify-center"
         >
           {loading ? 'Signing in...' : 'Sign in'}
         </button>
       </form>
 
       <p className="mt-6 text-center text-sm text-charcoal/70">
-        Don't have an account?{' '}
+        Don&apos;t have an account?{' '}
         <Link href="/register" className="text-burgundy-wine font-medium hover:underline">
           Register as a reader
         </Link>

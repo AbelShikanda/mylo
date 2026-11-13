@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapList } from '@/lib/api';
 
 interface Book {
   id: string;
@@ -28,8 +28,7 @@ export default function BooksPage() {
     apiClient
       .get<{ data: Book[] }>('/api/v1/books')
       .then((res) => {
-        const d = res.data as { data: Book[] };
-        setBooks(d.data);
+        setBooks(unwrapList<Book>(res));
         setLoading(false);
       })
       .catch((err) => setError(err.message));
@@ -82,7 +81,7 @@ export default function BooksPage() {
           {books.map((book) => (
             <div
               key={book.id}
-              className="bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm"
+              className="mylo-card p-6"
             >
               {book.cover_image && (
                 <img

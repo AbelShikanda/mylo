@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapList } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 import { Writer } from '@/types/auth';
 
@@ -18,9 +18,9 @@ export default function WritersPage() {
     }
 
     apiClient
-      .get<Writer[]>('/api/v1/writers')
+      .get<Writer[]>('/api/v1/admin/writers')
       .then((res) => {
-        setWriters(res.data);
+        setWriters(unwrapList<Writer>(res));
         setLoading(false);
       })
       .catch((err) => {
@@ -32,7 +32,7 @@ export default function WritersPage() {
   const handleSuspend = async (id: string) => {
     if (!confirm('Suspend this writer?')) return;
     try {
-      await apiClient.post(`/api/v1/users/${id}/suspend`);
+      await apiClient.put(`/api/v1/admin/writers/${id}/suspend`);
       window.location.reload();
     } catch (err: any) {
       setError(err.message);
@@ -42,7 +42,7 @@ export default function WritersPage() {
   const handleReinstate = async (id: string) => {
     if (!confirm('Reinstate this writer?')) return;
     try {
-      await apiClient.post(`/api/v1/users/${id}/reinstate`);
+      await apiClient.put(`/api/v1/admin/writers/${id}/reinstate`);
       window.location.reload();
     } catch (err: any) {
       setError(err.message);
@@ -52,7 +52,7 @@ export default function WritersPage() {
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto py-8 px-4">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-6">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-6">
           Loading Writers...
         </h1>
       </div>
@@ -62,7 +62,7 @@ export default function WritersPage() {
   if (error) {
     return (
       <div className="max-w-6xl mx-auto py-8 px-4">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-6">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-6">
           Error
         </h1>
         <p className="text-rose-muted">{error}</p>
@@ -73,7 +73,7 @@ export default function WritersPage() {
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-serif font-bold text-champagne mb-2">
+        <h1 className="text-3xl font-display font-bold text-champagne mb-2">
           Writer Management
         </h1>
       </div>
@@ -85,7 +85,7 @@ export default function WritersPage() {
       )}
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="mylo-table">
           <thead>
             <tr className="border-b border-burgundy-wine/40 text-rose-muted text-sm uppercase">
               <th className="pb-3">Email</th>
@@ -109,7 +109,7 @@ export default function WritersPage() {
                 <td className="py-4 text-right space-x-2">
                   <button
                     onClick={() => handleSuspend(writer.id)}
-                    className="px-3 py-1 text-xs text-red-400 hover:bg-red-500/20 rounded transition-colors"
+                    className="px-2.5 py-1.5 text-xs font-semibold text-[#F46F6F] hover:bg-red-500/10 border border-red-500/20 rounded-lg transition-colors"
                   >
                     Suspend
                   </button>

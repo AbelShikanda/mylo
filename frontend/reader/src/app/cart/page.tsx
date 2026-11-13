@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapData } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 
 interface CartItem {
+  id: string;
   book_id: string;
   title: string;
   slug: string;
@@ -19,6 +20,18 @@ export default function CartPage() {
   const [cart, setCart] = useState<{ items: CartItem[]; total: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [orderPlaced, setOrderPlaced] = useState(false);
+
+  const loadCart = () => {
+    apiClient
+      .get<{ data: { items: CartItem[]; total: string } }>('/api/v1/cart')
+      .then((res) => {
+        setCart(unwrapData<{ items: CartItem[]; total: string }>(res) ?? { items: [], total: '0.00' });
+        setLoading(false);
+      })
+      .catch((err) => setError(err.message));
+  };
 
   useEffect(() => {
     const token = authStorage.getToken();
@@ -26,16 +39,31 @@ export default function CartPage() {
       window.location.href = '/login';
       return;
     }
-
-    apiClient
-      .get<{ data: { items: CartItem[]; total: string } }>('/api/v1/cart')
-      .then((res) => {
-        const d = res.data as { data: { items: CartItem[]; total: string } };
-        setCart(d.data);
-        setLoading(false);
-      })
-      .catch((err) => setError(err.message));
+    loadCart();
   }, []);
+
+  const removeItem = async (itemId: string) => {
+    try {
+      await apiClient.delete(`/api/v1/cart/items/${itemId}`);
+      loadCart();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to remove item');
+    }
+  };
+
+  const checkout = async () => {
+    setCheckingOut(true);
+    setError(null);
+    try {
+      await apiClient.post('/api/v1/checkout', {});
+      setOrderPlaced(true);
+      setCart({ items: [], total: '0.00' });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Checkout failed');
+    } finally {
+      setCheckingOut(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -54,6 +82,30 @@ export default function CartPage() {
           Error
         </h1>
         <p className="text-charcoal/70 text-center">{error}</p>
+      </div>
+    );
+  }
+
+  if (orderPlaced) {
+    return (
+      <div className="max-w-2xl mx-auto py-20 px-4 text-center">
+        <h1 className="text-3xl font-serif font-bold text-burgundy-deep mb-4">
+          Order placed!
+        </h1>
+        <p className="text-charcoal/70 mb-6">
+          Your order has been created. Ebook purchases are available in your library.
+        </p>
+        <div className="flex items-center justify-center gap-4">
+          <Link
+            href="/library"
+            className="mylo-btn"
+          >
+            Go to My Library
+          </Link>
+          <Link href="/books" className="text-burgundy-wine hover:underline">
+            Continue shopping
+          </Link>
+        </div>
       </div>
     );
   }
@@ -80,13 +132,13 @@ export default function CartPage() {
           <p className="text-lg">Your cart is empty.</p>
           <Link
             href="/books"
-            className="mt-4 inline-block px-6 py-3 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine transition-colors"
+            className="mt-4 inline-block mylo-btn"
           >
             Browse books
           </Link>
         </div>
       ) : (
-        <div className="bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm">
+        <div className="mylo-card p-6">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-burgundy-deep/20 text-charcoal/60 text-sm uppercase">
@@ -94,6 +146,7 @@ export default function CartPage() {
                 <th className="pb-3 text-right">Price</th>
                 <th className="pb-3 text-right">Qty</th>
                 <th className="pb-3 text-right">Total</th>
+                <th className="pb-3"></th>
               </tr>
             </thead>
             <tbody>
@@ -104,6 +157,14 @@ export default function CartPage() {
                   <td className="py-4 text-right text-charcoal">{item.quantity}</td>
                   <td className="py-4 text-right text-charcoal">
                     ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                  </td>
+                  <td className="py-4 pl-4 text-right">
+                    <button
+                      onClick={() => removeItem(item.id)}
+                      className="text-red-600 hover:underline text-sm"
+                    >
+                      Remove
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -116,9 +177,11 @@ export default function CartPage() {
             </span>
           </div>
           <button
-            className="w-full py-3 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine transition-colors mt-4"
+            onClick={checkout}
+            disabled={checkingOut}
+            className="mylo-btn w-full justify-center mt-4"
           >
-            Proceed to Checkout
+            {checkingOut ? 'Processing…' : 'Place Order'}
           </button>
         </div>
       )}

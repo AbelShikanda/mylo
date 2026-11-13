@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapList } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 
 interface Article {
@@ -30,7 +30,7 @@ export default function ArticlesPage() {
     apiClient
       .get('/api/v1/writer/articles')
       .then((res) => {
-        setArticles(res.data as Article[]);
+        setArticles(unwrapList<Article>(res));
         setLoading(false);
       })
       .catch((err) => {
@@ -68,7 +68,7 @@ export default function ArticlesPage() {
         </h1>
         <Link
           href="/create"
-          className="px-6 py-3 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine transition-colors"
+          className="mylo-btn"
         >
           Create Article
         </Link>
@@ -141,7 +141,7 @@ export default function ArticlesPage() {
           <p className="text-lg">No articles yet.</p>
           <Link
             href="/create"
-            className="mt-4 inline-block px-6 py-3 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine transition-colors"
+            className="mt-4 inline-block mylo-btn"
           >
             Create your first article
           </Link>

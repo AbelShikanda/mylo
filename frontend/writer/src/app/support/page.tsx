@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapData } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 
 interface WriterProfile {
@@ -27,9 +27,9 @@ export default function SupportPage() {
     apiClient
       .get<{ data: WriterProfile }>('/api/v1/writer/profile')
       .then((res) => {
-        const d = res.data as { data: WriterProfile };
-        setProfile(d.data);
-        setSupportActive(!!d.data.support_active);
+        const d = unwrapData<WriterProfile>(res);
+        setProfile(d);
+        setSupportActive(!!d?.support_active);
         setLoading(false);
       })
       .catch((err) => setError(err.message));
@@ -87,7 +87,7 @@ export default function SupportPage() {
         </div>
       )}
 
-      <div className="bg-white p-6 rounded-lg border border-burgundy-deep/20 shadow-sm">
+      <div className="mylo-card p-6">
         <h2 className="font-serif font-bold text-burgundy-deep text-lg mb-4">
           Accept Financial Support
         </h2>

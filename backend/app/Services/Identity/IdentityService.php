@@ -38,7 +38,7 @@ class IdentityService extends \App\Services\Shared\BaseService
     public function assignRole(Administrator $admin, string $roleSlug): void
     {
         $role = AdminRole::where('slug', $roleSlug)->firstOrFail();
-        $admin->roles()->attach($role->id);
+        $admin->roles()->syncWithoutDetaching([$role->id]);
     }
 
     public function seedDefaultRolesAndPermissions(): void
@@ -99,8 +99,40 @@ class IdentityService extends \App\Services\Shared\BaseService
             );
         }
 
-        $superAdmin->permissions()->attach(
+        $superAdmin->permissions()->syncWithoutDetaching(
             AdminPermission::all()->pluck('id')
+        );
+
+        $editorialAdmin->permissions()->sync(
+            AdminPermission::whereIn('slug', [
+                'articles.view', 'articles.feature', 'articles.unfeature', 'articles.remove',
+                'categories.manage', 'homepage.manage', 'media.manage',
+            ])->pluck('id')
+        );
+
+        $communityModerator->permissions()->sync(
+            AdminPermission::whereIn('slug', [
+                'readers.view', 'writers.view', 'comments.moderate', 'articles.view', 'articles.remove',
+            ])->pluck('id')
+        );
+
+        $marketplaceManager->permissions()->sync(
+            AdminPermission::whereIn('slug', [
+                'books.manage', 'orders.manage', 'articles.view',
+            ])->pluck('id')
+        );
+
+        $financeAdmin->permissions()->sync(
+            AdminPermission::whereIn('slug', [
+                'finance.view', 'finance.payouts.manage', 'finance.refunds.manage',
+                'payment-gateways.manage', 'orders.manage', 'books.manage',
+            ])->pluck('id')
+        );
+
+        $analyticsAdmin->permissions()->sync(
+            AdminPermission::whereIn('slug', [
+                'analytics.view', 'audit-logs.view', 'readers.view', 'writers.view', 'articles.view',
+            ])->pluck('id')
         );
     }
 }

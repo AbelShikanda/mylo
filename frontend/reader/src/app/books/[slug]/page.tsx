@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
-import { apiClient } from '@/lib/api';
+import { apiClient, unwrapData } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 
 interface Book {
@@ -20,21 +20,51 @@ interface Book {
   product_category?: { name: string };
 }
 
-export default function BookDetailPage({ params }: { params: { slug: string } }) {
+export default function BookDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
+
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [cartError, setCartError] = useState<string | null>(null);
 
   useEffect(() => {
     apiClient
-      .get<{ data: Book }>('/api/v1/books/' + params.slug)
+      .get<{ data: Book }>('/api/v1/books/' + slug)
       .then((res) => {
-        const d = res.data as { data: Book };
-        setBook(d.data);
+        setBook(unwrapData<Book>(res));
         setLoading(false);
       })
-      .catch((err) => setError(err.message));
-  }, [params.slug]);
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [slug]);
+
+  const addToCart = async () => {
+    if (!book) return;
+    const token = authStorage.getToken();
+    if (!token) {
+      window.location.href = '/login';
+      return;
+    }
+    setAdding(true);
+    setCartError(null);
+    setNotice(null);
+    try {
+      await apiClient.post('/api/v1/cart/items', {
+        book_id: book.id,
+        quantity: 1,
+      });
+      setNotice('Added to your cart.');
+    } catch (err) {
+      setCartError(err instanceof Error ? err.message : 'Failed to add to cart');
+    } finally {
+      setAdding(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -55,7 +85,7 @@ export default function BookDetailPage({ params }: { params: { slug: string } })
         <p className="text-charcoal/70 text-center">{error}</p>
         <Link
           href="/books"
-          className="mt-4 inline-block px-6 py-3 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine transition-colors"
+          className="mt-4 inline-block mylo-btn"
         >
           Browse books
         </Link>
@@ -108,19 +138,28 @@ export default function BookDetailPage({ params }: { params: { slug: string } })
             </span>
           </div>
 
-          {book.is_available && book.product_type === 'ebook' && (
-            <button
-              className="w-full py-4 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine transition-colors"
-            >
-              Buy Ebook
-            </button>
+          {cartError && (
+            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded text-sm">
+              {cartError}
+            </div>
           )}
 
-          {book.is_available && book.product_type === 'physical' && (
+          {notice && (
+            <div className="p-3 bg-green-50 border border-green-200 text-green-700 rounded text-sm">
+              {notice}{' '}
+              <Link href="/cart" className="font-medium underline">
+                Go to cart →
+              </Link>
+            </div>
+          )}
+
+          {book.is_available && (
             <button
-              className="w-full py-4 bg-burgundy-deep text-white font-medium rounded-md hover:bg-burgundy-wine transition-colors"
+              onClick={addToCart}
+              disabled={adding}
+              className="mylo-btn w-full justify-center"
             >
-              Buy Physical Book
+              {adding ? 'Adding…' : book.product_type === 'ebook' ? 'Add Ebook to Cart' : 'Add to Cart'}
             </button>
           )}
         </div>
