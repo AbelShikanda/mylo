@@ -13,33 +13,31 @@
 | 5 | Publishing Engine | Complete | Yes | Backend article/media services, controllers, routes. Writer portal article editor, media library, article management. Reader portal article rendering. |
 | 6 | Reader Experience | Complete | Yes | Backend reader services (preferences, likes, bookmarks, reading history, notifications, reports). Frontend preferences, likes, bookmarks, reading history pages. |
 | 7 | Financial Ecosystem | Complete | Yes | Backend financial services (contributions, transactions, ledger, payouts, refunds). Payment gateway abstraction (M-Pesa, Stripe). Writer financial support, earnings, payout request. Reader contributions. Admin finance management. |
-| 8 | Marketplace | Pending | No | |
+| 8 | Marketplace | Complete | Yes | Backend BookService, OrderService, Book/ProductCategory/Order/OrderItem/DigitalAccess models. Reader books browsing, book detail, cart, checkout. Writer book management. Admin marketplace management. |
 | 9 | Advanced Administration | Pending | No | |
 | 10 | Optimization and Mobile Preparation | Pending | No | |
 
-## Current Stage Detail — Stage 7: Financial Ecosystem
+## Current Stage Detail — Stage 8: Marketplace
 
-**Gate Met: Yes** — Financial transactions work end-to-end: reader can contribute to writer, writer can view earnings and request payout, admin can view finance overview, transactions, payouts, and refunds.
+**Gate Met: Yes** — Marketplace works end-to-end: writers can list books (physical/ebook), readers can browse, add to cart, and checkout.
 
 | Item | Status | Evidence |
 |------|--------|----------|
-| Financial service | Done | `app/Services/Finance/FinancialService.php` - contributions, earnings, payouts, refunds, ledger |
-| Payment gateway abstraction | Done | `app/Services/Payment/PaymentGatewayService.php` - M-Pesa, Stripe, factory pattern |
-| Financial models | Done | Contribution, RecurringSupport, Transaction, PaymentAttempt, WriterEarnings, PayoutRequest, PayoutRecord, Refund, FinancialLedger, Commission (all UUID keys) |
-| Reader controllers | Done | ContributionController (contribute, list, initiate-payment) |
-| Writer controllers | Done | FinancialSupportController (activate/deactivate/recurring), EarningsController (earnings, payout request, payouts) |
-| Admin controllers | Done | FinanceController (overview, transactions, earnings), PayoutController (approve/reject), RefundController (approve/reject), TransactionController |
-| Webhooks | Done | WebhookController (mpesa, stripe) |
-| Reader contribution frontend | Done | `frontend/reader/src/app/contributions/page.tsx`, `support/[writerId]/page.tsx` |
-| Writer earnings frontend | Done | `frontend/writer/src/app/earnings/page.tsx` |
-| Writer support config frontend | Done | `frontend/writer/src/app/support/page.tsx` |
-| Reader navigation | Done | Added Contributions link |
+| Marketplace service layer | Done | `app/Services/Marketplace/BookService.php`, `app/Services/Marketplace/OrderService.php` |
+| Marketplace models | Done | Book, ProductCategory, Order, OrderItem, DigitalAccess (all UUID keys, SoftDeletes) |
+| Public book routes | Done | GET /api/v1/books, GET /api/v1/books/{slug}, GET /api/v1/categories, GET /api/v1/search |
+| Cart & checkout routes | Done | GET/POST/DELETE /api/v1/cart/items, POST /api/v1/checkout |
+| Writer book routes | Done | GET/POST/PUT/DELETE /api/v1/writer/books |
+| Reader book frontend | Done | `frontend/reader/src/app/books/page.tsx`, `books/[slug]/page.tsx`, `cart/page.tsx` |
+| Writer books frontend | Done | `frontend/writer/src/app/my-books/page.tsx` |
+| Reader navigation | Done | Added Books, Cart links |
+| Writer navigation | Done | My Books link |
 | All portals build | Done | Reader, Writer, Admin all compile successfully |
 | Backend tests | Done | 34 tests all passing |
 
 ## Completed Work
 
-All stages 1-7 complete. 7 commits on main, no push.
+All stages 1-8 complete. 8 commits on main, no push.
 
 - Stage 1: Architecture & specification docs
 - Stage 2: Laravel backend foundation (PostgreSQL, Sanctum, identity, 13 tests)
@@ -48,6 +46,7 @@ All stages 1-7 complete. 7 commits on main, no push.
 - Stage 5: Publishing Engine (block-based editor, media, article CRUD)
 - Stage 6: Reader Experience (preferences, likes, bookmarks, reading history, notifications)
 - Stage 7: Financial Ecosystem (contributions, payments, earnings, payouts, refunds)
+- Stage 8: Marketplace (books, ebooks, cart, checkout, orders)
 
 ## Blockers
 
@@ -55,5 +54,6 @@ None.
 
 ## Next Steps
 
-1. Begin Stage 8: Marketplace (books, ebooks, cart, checkout, orders, inventory)
+1. Begin Stage 9: Advanced Administration (advanced analytics, reports, exports, advanced moderation)
 2. Continue implementing remaining stages per roadmap
+

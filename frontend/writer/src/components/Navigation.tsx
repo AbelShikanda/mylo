@@ -12,7 +12,7 @@ const writerNav = [
   { name: 'Drafts', href: '/drafts' },
   { name: 'Scheduled', href: '/scheduled' },
   { name: 'Media Library', href: '/media' },
-  { name: 'My Books', href: '/books' },
+  { name: 'My Books', href: '/my-books' },
   { name: 'Comments', href: '/comments' },
   { name: 'Financial Support', href: '/support' },
   { name: 'Earnings', href: '/earnings' },

@@ -10,6 +10,7 @@ const readerNav = [
   { name: 'Explore', href: '/explore' },
   { name: 'Articles', href: '/articles' },
   { name: 'Books', href: '/books' },
+  { name: 'Cart', href: '/cart' },
   { name: 'Likes', href: '/likes' },
   { name: 'Contributions', href: '/contributions' },
   { name: 'Saved', href: '/bookmarks' },
