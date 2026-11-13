@@ -1,0 +1,172 @@
+version: '3.8'
+
+services:
+  ###############################################################################
+  # Backend API (Laravel)
+  ###############################################################################
+  backend:
+    build: ./backend
+    container_name: mylo-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=Mylo
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_URL=http://localhost:8000
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=mylo
+      - DB_USERNAME=mylo
+      - DB_PASSWORD=mylo
+      - CACHE_DRIVER=redis
+      - QUEUE_CONNECTION=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=
+      - SESSION_DRIVER=redis
+      - SESSION_LIFETIME=120
+      - MAIL_MAILER=smtp
+      - MAIL_HOST=smtp.mailtrap.io
+      - MAIL_PORT=2525
+      - MAIL_USERNAME=
+      - MAIL_PASSWORD=
+      - MAIL_ENCRYPTION=tls
+      - MAIL_FROM_ADDRESS=noreply@mylo.test
+      - MAIL_FROM_NAME="Mylo"
+      - SANCTUM_STATEFUL_DOMAINS=localhost:3000,localhost:3001,localhost:3002
+      - SESSION_DOMAIN=localhost
+      - FILESYSTEM_DISK=local
+      - AWS_ACCESS_KEY_ID=
+      - AWS_SECRET_ACCESS_KEY=
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_BUCKET=mylo-media
+      - AWS_URL=
+      - MEILISEARCH_HOST=http://meilisearch:7700
+      - MEILISEARCH_API_KEY=masterKey
+      - PLATFORM_COMMISSION_RATE=0.05
+      - MINIMUM_PAYOUT=10.00
+      - CURRENCY=KES
+    depends_on:
+      - db
+      - redis
+      - meilisearch
+    volumes:
+      - ./backend/storage:/var/www/storage
+
+  ###############################################################################
+  # PostgreSQL Database
+  ###############################################################################
+  db:
+    image: postgres:17-alpine
+    container_name: mylo-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=mylo
+      - POSTGRES_USER=mylo
+      - POSTGRES_PASSWORD=mylo
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  ###############################################################################
+  # Redis (Cache & Queue)
+  ###############################################################################
+  redis:
+    image: redis:7-alpine
+    container_name: mylo-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
+  ###############################################################################
+  # Meilisearch (Search)
+  ###############################################################################
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: mylo-meilisearch
+    restart: unless-stopped
+    ports:
+      - "7700:7700"
+    environment:
+      - MEILISEARCH_API_KEY=masterKey
+      - MEILISEARCH_NO_ANALYTICS=true
+    volumes:
+      - meilisearch_data:/meili_data
+
+  ###############################################################################
+  # MinIO (S3-Compatible Storage)
+  ###############################################################################
+  minio:
+    image: minio/minio:latest
+    container_name: mylo-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=mylo
+      - MINIO_ROOT_PASSWORD=mylo-password
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+
+  ###############################################################################
+  # Reader Portal (Next.js)
+  ###############################################################################
+  reader:
+    build:
+      context: ./frontend/reader
+      dockerfile: Dockerfile
+    container_name: mylo-reader
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+  ###############################################################################
+  # Writer Portal (Next.js)
+  ###############################################################################
+  writer:
+    build:
+      context: ./frontend/writer
+      dockerfile: Dockerfile
+    container_name: mylo-writer
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+  ###############################################################################
+  # Administrator Portal (Next.js)
+  ###############################################################################
+  admin:
+    build:
+      context: ./frontend/admin
+      dockerfile: Dockerfile
+    container_name: mylo-admin
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  redis_data:
+  meilisearch_data:
+  minio_data:
