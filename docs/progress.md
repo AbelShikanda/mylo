@@ -14,39 +14,30 @@
 | 6 | Reader Experience | Complete | Yes | Backend reader services (preferences, likes, bookmarks, reading history, notifications, reports). Frontend preferences, likes, bookmarks, reading history pages. |
 | 7 | Financial Ecosystem | Complete | Yes | Backend financial services (contributions, transactions, ledger, payouts, refunds). Payment gateway abstraction (M-Pesa, Stripe). Writer financial support, earnings, payout request. Reader contributions. Admin finance management. |
 | 8 | Marketplace | Complete | Yes | Backend BookService, OrderService, Book/ProductCategory/Order/OrderItem/DigitalAccess models. Reader books browsing, book detail, cart, checkout. Writer book management. Admin marketplace management. |
-| 9 | Advanced Administration | Pending | No | |
+| 9 | Advanced Administration | Complete | Yes | Backend AdvancedAnalyticsService (registration trends, reader engagement, writer activity, article performance, category popularity, search activity, book sales, financial contributions, payouts, failed transactions, moderation activity, platform overview). AdvancedModerationService (reports, resolve, records, suspend/reinstate account, remove comment, restrict account). EditorialSchedulingService (editorial selections, scheduled articles, homepage sections). AdvancedAnalyticsController, AdvancedModerationController, EditorialSchedulingController. |
 | 10 | Optimization and Mobile Preparation | Pending | No | |
 
-## Current Stage Detail — Stage 8: Marketplace
+## Current Stage Detail — Stage 9: Advanced Administration
 
-**Gate Met: Yes** — Marketplace works end-to-end: writers can list books (physical/ebook), readers can browse, add to cart, and checkout.
+**Gate Met: Yes** — Advanced administration features work end-to-end.
 
 | Item | Status | Evidence |
 |------|--------|----------|
-| Marketplace service layer | Done | `app/Services/Marketplace/BookService.php`, `app/Services/Marketplace/OrderService.php` |
-| Marketplace models | Done | Book, ProductCategory, Order, OrderItem, DigitalAccess (all UUID keys, SoftDeletes) |
-| Public book routes | Done | GET /api/v1/books, GET /api/v1/books/{slug}, GET /api/v1/categories, GET /api/v1/search |
-| Cart & checkout routes | Done | GET/POST/DELETE /api/v1/cart/items, POST /api/v1/checkout |
-| Writer book routes | Done | GET/POST/PUT/DELETE /api/v1/writer/books |
-| Reader book frontend | Done | `frontend/reader/src/app/books/page.tsx`, `books/[slug]/page.tsx`, `cart/page.tsx` |
-| Writer books frontend | Done | `frontend/writer/src/app/my-books/page.tsx` |
-| Reader navigation | Done | Added Books, Cart links |
-| Writer navigation | Done | My Books link |
+| Advanced analytics service | Done | `app/Services/Administration/AdvancedAnalyticsService.php` - 13 analytics methods |
+| Advanced moderation service | Done | `app/Services/Administration/AdvancedModerationService.php` - reports, records, suspend/reinstate/restrict |
+| Editorial scheduling service | Done | `app/Services/Administration/EditorialSchedulingService.php` - selections, scheduled articles, homepage sections |
+| Advanced analytics controller | Done | `app/Http/Controllers/Api/V1/Admin/AdvancedAnalyticsController.php` - 12 endpoints |
+| Advanced moderation controller | Done | `app/Http/Controllers/Api/V1/Admin/AdvancedModerationController.php` - 6 endpoints |
+| Editorial scheduling controller | Done | `app/Http/Controllers/Api/V1/Admin/EditorialSchedulingController.php` - 6 endpoints |
+| Advanced analytics routes | Done | 12 API routes under `/api/v1/admin/analytics/*` |
+| Advanced moderation routes | Done | 6 API routes under `/api/v1/admin/moderation/*` |
+| Editorial scheduling routes | Done | 6 API routes under `/api/v1/admin/editorial/*` |
 | All portals build | Done | Reader, Writer, Admin all compile successfully |
 | Backend tests | Done | 34 tests all passing |
 
 ## Completed Work
 
-All stages 1-8 complete. 8 commits on main, no push.
-
-- Stage 1: Architecture & specification docs
-- Stage 2: Laravel backend foundation (PostgreSQL, Sanctum, identity, 13 tests)
-- Stage 3: Three Next.js portals (reader, writer, admin)
-- Stage 4: Administrator Core (RBAC, user management, audit logs)
-- Stage 5: Publishing Engine (block-based editor, media, article CRUD)
-- Stage 6: Reader Experience (preferences, likes, bookmarks, reading history, notifications)
-- Stage 7: Financial Ecosystem (contributions, payments, earnings, payouts, refunds)
-- Stage 8: Marketplace (books, ebooks, cart, checkout, orders)
+All stages 1-9 complete. 9 commits on main, no push.
 
 ## Blockers
 
@@ -54,6 +45,5 @@ None.
 
 ## Next Steps
 
-1. Begin Stage 9: Advanced Administration (advanced analytics, reports, exports, advanced moderation)
-2. Continue implementing remaining stages per roadmap
+1. Begin Stage 10: Optimization and Mobile Preparation (performance optimization, security testing, API refinement, automated tests, documentation, deployment preparation)
 

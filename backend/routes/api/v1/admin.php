@@ -18,7 +18,10 @@ use App\Http\Controllers\Api\V1\Admin\PaymentGatewayController;
 use App\Http\Controllers\Api\V1\Admin\HomepageController;
 use App\Http\Controllers\Api\V1\Admin\NotificationController;
 use App\Http\Controllers\Api\V1\Admin\AnalyticsController;
+use App\Http\Controllers\Api\V1\Admin\AdvancedAnalyticsController;
+use App\Http\Controllers\Api\V1\Admin\AdvancedModerationController;
 use App\Http\Controllers\Api\V1\Admin\AdministratorController;
+use App\Http\Controllers\Api\V1\Admin\EditorialSchedulingController;
 use App\Http\Controllers\Api\V1\Admin\RoleController;
 use App\Http\Controllers\Api\V1\Admin\PermissionController;
 use App\Http\Controllers\Api\V1\Admin\AuditLogController;
@@ -96,6 +99,37 @@ Route::prefix('admin')->middleware('auth:sanctum,admin')->group(function () {
 
     // Analytics
     Route::get('analytics/reports', [AnalyticsController::class, 'reports'])->name('analytics.reports');
+
+    // Advanced Analytics
+    Route::get('analytics/registration-trends', [AdvancedAnalyticsController::class, 'registrationTrends'])->name('analytics.registration-trends');
+    Route::get('analytics/reader-engagement', [AdvancedAnalyticsController::class, 'readerEngagement'])->name('analytics.reader-engagement');
+    Route::get('analytics/writer-activity', [AdvancedAnalyticsController::class, 'writerActivity'])->name('analytics.writer-activity');
+    Route::get('analytics/article-performance', [AdvancedAnalyticsController::class, 'articlePerformance'])->name('analytics.article-performance');
+    Route::get('analytics/category-popularity', [AdvancedAnalyticsController::class, 'categoryPopularity'])->name('analytics.category-popularity');
+    Route::get('analytics/search-activity', [AdvancedAnalyticsController::class, 'searchActivity'])->name('analytics.search-activity');
+    Route::get('analytics/book-sales', [AdvancedAnalyticsController::class, 'bookSales'])->name('analytics.book-sales');
+    Route::get('analytics/financial-contributions', [AdvancedAnalyticsController::class, 'financialContributions'])->name('analytics.financial-contributions');
+    Route::get('analytics/payouts', [AdvancedAnalyticsController::class, 'payouts'])->name('analytics.payouts');
+    Route::get('analytics/failed-transactions', [AdvancedAnalyticsController::class, 'failedTransactions'])->name('analytics.failed-transactions');
+    Route::get('analytics/moderation-activity', [AdvancedAnalyticsController::class, 'moderationActivity'])->name('analytics.moderation-activity');
+    Route::get('analytics/platform-overview', [AdvancedAnalyticsController::class, 'platformOverview'])->name('analytics.platform-overview');
+
+    // Advanced Moderation
+    Route::get('moderation/reports', [AdvancedModerationController::class, 'getReports'])->name('moderation.reports');
+    Route::post('moderation/reports/{reportId}/resolve', [AdvancedModerationController::class, 'resolveReport'])->name('moderation.reports.resolve');
+    Route::get('moderation/records', [AdvancedModerationController::class, 'getModerationRecords'])->name('moderation.records');
+    Route::post('moderation/accounts/suspend', [AdvancedModerationController::class, 'suspendAccount'])->name('moderation.accounts.suspend');
+    Route::post('moderation/accounts/reinstate', [AdvancedModerationController::class, 'reinstateAccount'])->name('moderation.accounts.reinstate');
+    Route::post('moderation/comments/{commentId}/remove', [AdvancedModerationController::class, 'removeComment'])->name('moderation.comments.remove');
+    Route::post('moderation/accounts/restrict', [AdvancedModerationController::class, 'restrictAccount'])->name('moderation.accounts.restrict');
+
+    // Editorial Scheduling
+    Route::get('editorial/selections', [EditorialSchedulingController::class, 'getEditorialSelections'])->name('editorial.selections');
+    Route::post('editorial/selections', [EditorialSchedulingController::class, 'createEditorialSelection'])->name('editorial.selections.store');
+    Route::put('editorial/selections/{selection}', [EditorialSchedulingController::class, 'updateEditorialSelection'])->name('editorial.selections.update');
+    Route::delete('editorial/selections/{selection}', [EditorialSchedulingController::class, 'deleteEditorialSelection'])->name('editorial.selections.destroy');
+    Route::get('editorial/scheduled-articles', [EditorialSchedulingController::class, 'getScheduledArticles'])->name('editorial.scheduled-articles');
+    Route::get('editorial/homepage-sections', [EditorialSchedulingController::class, 'getHomepageSections'])->name('editorial.homepage-sections');
 
     // Administrator accounts
     Route::get('administrators', [AdministratorController::class, 'index'])->name('administrators.index');
